@@ -1,0 +1,155 @@
+package com.TTLTTBDD.server.controllers;
+
+import com.TTLTTBDD.server.exception.PasswordValidationException;
+import com.TTLTTBDD.server.exception.UserAlreadyExistsException;
+import com.TTLTTBDD.server.exception.UserNotVerifiedException;
+import com.TTLTTBDD.server.models.dto.UserDTO;
+import com.TTLTTBDD.server.models.entity.User;
+import com.TTLTTBDD.server.models.entity.Verifytoken;
+import com.TTLTTBDD.server.repositories.UserRepository;
+import com.TTLTTBDD.server.repositories.VerifyTokenRepository;
+import com.TTLTTBDD.server.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.view.RedirectView;
+
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@RestController
+@CrossOrigin(origins = {"http://localhost:31415"})
+@RequestMapping("/api/users")
+public class UserController {
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private VerifyTokenRepository verifyTokenRepository;
+    @Autowired
+    private UserRepository userRepository;
+
+    @GetMapping
+    public List<UserDTO> getAllUsers() {
+        return userService.getAllUsers();
+    }
+
+    @GetMapping("/id")
+    public Optional<UserDTO> getUserById(@RequestParam int id){
+        return userService.getUserById(id);
+    }
+
+    @CrossOrigin(origins = {"http://localhost:31415"})
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestParam String username, @RequestParam String password) {
+        try {
+            Optional<UserDTO> userDTO = userService.login(username, password);
+            if (userDTO.isPresent()) {
+                return ResponseEntity.ok(userDTO.get());
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai tên đăng nhập hoặc mật khẩu.");
+            }
+        } catch (UserNotVerifiedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống.");
+        }
+    }
+
+
+    @CrossOrigin(origins = {"http://localhost:31415"})
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody User user) {
+        try {
+            return ResponseEntity.ok(userService.register(user));
+        } catch (UserAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", "user đã tồn tại"));
+        } catch (PasswordValidationException e) {
+            Map<String, Object> response = new LinkedHashMap<>();
+            response.put("error", "Mật khẩu không hợp lệ");
+            response.put("details", e.getErrors());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "internal_error"));
+        }
+    }
+
+
+    @PutMapping("/updateInfoAccount")
+    public UserDTO updateUser(@RequestParam("id") Integer id, @RequestParam("username") String username, @RequestParam("fullname") String fullname, @RequestParam("address") String address, @RequestParam("phone") String phone, @RequestParam("email") String email) {
+        UserDTO userDTO = UserDTO.builder()
+                .id(id)
+                .username(username)
+                .fullname(fullname)
+                .address(address)
+                .phone(phone)
+                .email(email)
+                .build();
+        return userService.updateUserInfoAccount(userDTO);
+    }
+
+    @PutMapping("/updateAvata")
+    public UserDTO updateUser(@RequestParam("id") Integer id, @RequestParam("avataFile") MultipartFile avataFile) {
+        UserDTO userDTO = UserDTO.builder()
+                .id(id)
+                .build();
+        return userService.updateUserAvata(userDTO, avataFile); 
+    }
+
+    @PutMapping("/update")
+    public UserDTO updateUser(
+            @RequestParam("id") Integer id,
+            @RequestParam("username") String username,
+            @RequestParam("fullname") String fullname,
+            @RequestParam("address") String address,
+            @RequestParam("phone") String phone,
+            @RequestParam("email") String email,
+            @RequestParam("role") boolean role,
+            @RequestParam(value = "avataFile", required = false) MultipartFile avataFile) {
+
+        UserDTO userDTO = UserDTO.builder()
+                .id(id)
+                .username(username)
+                .fullname(fullname)
+                .address(address)
+                .phone(phone)
+                .email(email)
+                .role(role)
+                .build();
+
+        return userService.updateUser(userDTO, avataFile);  // Chuyển file avatar nếu có, nếu không thì null
+    }
+
+
+    @DeleteMapping("/delete/{id}")
+    public String deleteUser(@PathVariable("id") Integer id) {
+        userService.deleteUser(id);
+        return "User with ID " + id + " has been deleted.";
+    }
+    @GetMapping("/verify")
+    public RedirectView verifyAccount(@RequestParam("token") String token) {
+        Optional<Verifytoken> optionalToken = verifyTokenRepository.findByToken(token);
+        if (optionalToken.isEmpty()) {
+            return new RedirectView("/verify-failed.html");
+        }
+
+        Verifytoken verificationToken = optionalToken.get();
+        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            return new RedirectView("/verify-expired.html");
+        }
+
+        User user = verificationToken.getUser();
+        user.setStatus(true);
+        userRepository.save(user);
+
+        verifyTokenRepository.delete(verificationToken);
+
+        return new RedirectView("/verify_success.html?username=" + user.getUsername());
+    }
+
+
+}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    <link rel="manifest" href="assets/favicon/site.webmanifest">
+    <link rel="stylesheet" href="assets/font/webfonts/Montserrat.css">
+    <link rel="stylesheet" href="/styles/reset.css">
+    <link rel="stylesheet" href="/styles/base.css">
+    <link rel="stylesheet" href="/styles/verify_success.css">
+</head>
+<body>
+<main>
+    <div class="verify">
+        <i class="verify__icon fa-solid fa-check"></i>
+    </div>
+    <h1>Xác thực thành công</h1>
+    <p>
+        Chúc mừng tài khoản <b id="username"></b> của bạn đã xác thực thành công!
+    </p>
+    <a href="#" class="button button--hover">Tiến hành đăng nhập</a>
+</main>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const username = params.get('username');
+    if (username) {
+        document.getElementById('username').textContent = username;
+    }
+</script>
+</body>
+</html>
