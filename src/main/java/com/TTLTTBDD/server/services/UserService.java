@@ -89,15 +89,15 @@ public class UserService {
     }
 
     public UserDTO updateUserInfoAccount(UserDTO userDTO) {
-            User user = userRepository.findById(userDTO.getId()).orElseThrow(() -> new RuntimeException("Ko tìm thấy user"));
-            user.setUsername(userDTO.getUsername());
-            user.setFullname(userDTO.getFullname());
-            user.setAddress(userDTO.getAddress());
-            user.setPhone(userDTO.getPhone());
-            user.setEmail(userDTO.getEmail());
+        User user = userRepository.findById(userDTO.getId()).orElseThrow(() -> new RuntimeException("Ko tìm thấy user"));
+        user.setUsername(userDTO.getUsername());
+        user.setFullname(userDTO.getFullname());
+        user.setAddress(userDTO.getAddress());
+        user.setPhone(userDTO.getPhone());
+        user.setEmail(userDTO.getEmail());
 
-            userRepository.save(user);
-            return convertToDTO(user);
+        userRepository.save(user);
+        return convertToDTO(user);
 
     }
 
@@ -187,20 +187,20 @@ public class UserService {
                 .status(user.getStatus())
                 .build();
     }
-    private void validatePassword(String password) {
+    public void validatePassword(String password) {
         List<String> errors = new ArrayList<>();
 
         if (password.length() < 8) {
             errors.add("mật khẩu phải tối thiểu 8 kí tự");
         }
         if (!password.matches(".*[A-Z].*")) {
-            errors.add("Mật khẩu phải chứa ít nhất 1 kí tự in hoa");
+            errors.add("Mật khẩu phải ít nhất 1 kí tự hoa");
         }
         if (!password.matches(".*\\d.*")) {
-            errors.add("Mật khẩu phải chứa ít nhất 1 chữ số");
+            errors.add("Mật khẩu phải ít nhất 1 chữ số");
         }
         if (!password.matches(".*[^a-zA-Z0-9].*")) {
-            errors.add("Mật khẩu phải chứa ít nhất 1 kí tự đặt biệt");
+            errors.add("Mật khẩu phải ít nhất 1 kí tự đặt biệt");
         }
         if (!errors.isEmpty()) {
             throw new PasswordValidationException(errors);
