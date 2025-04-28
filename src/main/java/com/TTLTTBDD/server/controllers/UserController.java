@@ -17,13 +17,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:31415"})
+@CrossOrigin(origins = {"http://localhost:3000"})
 @RequestMapping("/api/users")
 public class UserController {
     @Autowired
@@ -43,7 +40,7 @@ public class UserController {
         return userService.getUserById(id);
     }
 
-    @CrossOrigin(origins = {"http://localhost:31415"})
+    @CrossOrigin(origins = {"http://localhost:3000"})
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestParam String username, @RequestParam String password) {
         try {
@@ -61,7 +58,7 @@ public class UserController {
     }
 
 
-    @CrossOrigin(origins = {"http://localhost:31415"})
+    @CrossOrigin(origins = {"http://localhost:3000"})
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
         try {
@@ -77,6 +74,36 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "internal_error"));
         }
     }
+    @GetMapping("/check-user")
+    public ResponseEntity<?> checkUserExist(
+            @RequestParam String username,
+            @RequestParam String email) {
+
+        boolean usernameExists = userRepository.findByUsername(username).isPresent();
+        boolean emailExists = userRepository.findByEmail(email).isPresent();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("usernameExists", usernameExists);
+        response.put("emailExists", emailExists);
+
+        return ResponseEntity.ok(response);
+    }
+    @PostMapping("/validate-password")
+    public ResponseEntity<?> validatePassword(@RequestBody Map<String, String> request) {
+        String password = request.get("password");
+
+        try {
+            userService.validatePassword(password);
+            return ResponseEntity.ok(Map.of("valid", true));
+        } catch (PasswordValidationException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "valid", false,
+                    "errors", e.getErrors()
+            ));
+        }
+    }
+
+
 
 
     @PutMapping("/updateInfoAccount")
@@ -97,7 +124,7 @@ public class UserController {
         UserDTO userDTO = UserDTO.builder()
                 .id(id)
                 .build();
-        return userService.updateUserAvata(userDTO, avataFile); 
+        return userService.updateUserAvata(userDTO, avataFile);
     }
 
     @PutMapping("/update")
