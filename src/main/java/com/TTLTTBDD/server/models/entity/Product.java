@@ -31,7 +31,7 @@ public class Product {
     @Column(name = "rating", nullable = true)
     private Double rating;
 
-    @Column(name = "image", nullable = false, length = 50)
+    @Column(name = "image", nullable = false, length = 255)
     private String image;
 
     @Column(name = "description", nullable = false, length = 100)
