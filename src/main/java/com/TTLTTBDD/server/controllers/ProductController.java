@@ -20,25 +20,31 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:31415"})
+@CrossOrigin(origins = {"http://localhost:3000"})
 @RequestMapping("/api/products")
 public class ProductController {
     @Autowired
     private ProductService productService;
     private loadFile fileUploader = new loadFile();
+
     @GetMapping
     public List<ProductDTO> getAllProducts() {
         return productService.getAllProducts();
     }
 
     @GetMapping("/id")
-    public Optional<ProductDTO> getProductById(@RequestParam int id){
+    public Optional<ProductDTO> getProductById(@RequestParam int id) {
         return productService.getProductById(id);
     }
 
     @GetMapping("/idCategory")
-    public List<ProductDTO> getProductsByCategoryID(@RequestParam int idCategory){
+    public List<ProductDTO> getProductsByCategoryID(@RequestParam int idCategory) {
         return productService.getProductsByCategoryID(idCategory);
+    }
+
+    @GetMapping("/tag")
+    public List<ProductDTO> getProductsByTag(@RequestParam String tag) {
+        return productService.getProductsByTag(tag);
     }
 
     @PostMapping("/createProduct")
@@ -51,12 +57,13 @@ public class ProductController {
             @RequestParam("image") MultipartFile image) {
         try {
             String fileName = fileUploader.saveFile(image);
-            ProductDTO newProduct = productService.addProduct(name,quantity,prize,description,id_category, fileName);
+            ProductDTO newProduct = productService.addProduct(name, quantity, prize, description, id_category, fileName);
             return ResponseEntity.ok(newProduct);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
     @PutMapping("/editProduct/{id}")
     public ResponseEntity<ProductDTO> editProduct(
             @PathVariable int id,
@@ -71,7 +78,7 @@ public class ProductController {
             if (image != null) {
                 fileName = fileUploader.saveFile(image);
             }
-            ProductDTO editProduct = productService.editProduct(id, name,quantity,prize,description,id_category,fileName);
+            ProductDTO editProduct = productService.editProduct(id, name, quantity, prize, description, id_category, fileName);
             return ResponseEntity.ok(editProduct);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
