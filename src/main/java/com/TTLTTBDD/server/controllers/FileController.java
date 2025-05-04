@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 
 @RestController
 public class FileController {
-    @CrossOrigin(origins = {"http://localhost:31415"})
+    @CrossOrigin(origins = {"http://localhost:3000"})
     @GetMapping("/uploads/{filename}")
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
         try {

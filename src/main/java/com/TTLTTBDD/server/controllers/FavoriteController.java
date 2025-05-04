@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:31415"})
+@CrossOrigin(origins = {"http://localhost:3000"})
 @RequestMapping("/api/favorites")
 public class FavoriteController {
     @Autowired
