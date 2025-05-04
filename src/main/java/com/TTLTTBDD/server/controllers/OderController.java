@@ -17,7 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/orders")
-@CrossOrigin(origins = "http://localhost:31415")
+@CrossOrigin(origins = "http://localhost:3000")
 public class OderController {
 
     @Autowired
