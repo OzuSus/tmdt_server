@@ -26,15 +26,10 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Override
     public String addFavorite(Integer userId, Integer productId) {
-        //tìm xem user tồn tại hay không?
-        //nếu không trả về user = null
         User user = userRepository.findById(userId).orElse(null);
-        //tìm xem product tồn tại hay không?
-        //nếu không trả về product = null
         Product product = productRepository.findById(productId).orElse(null);
 
         if (user == null || product == null) {
-            //nếu user hoặc product không tồn tại thì trả về thông báo
             return "User hoặc Product không tồn tại.";
         }
         Favorite favorite = new Favorite();
