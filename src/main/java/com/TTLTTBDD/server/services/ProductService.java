@@ -31,13 +31,19 @@ public class ProductService {
         return productRepository.findProductById(id).map(this::convertToDTO);
     }
 
-    public List<ProductDTO> getProductsByCategoryID(int idCategory){
-        return productRepository.findByIdCategory_Id (idCategory).stream()
+    public List<ProductDTO> getProductsByCategoryID(int idCategory) {
+        return productRepository.findByIdCategory_Id(idCategory).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-    public String deleteProduct(int idProduct){
+    public List<ProductDTO> getProductsByTag(String tag) {
+        return productRepository.findByTagIgnoreCase(tag).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public String deleteProduct(int idProduct) {
         Optional<Product> existingProduct = productRepository.findProductById(idProduct);
         if (existingProduct.isEmpty()) {
             return "Product does not exist";
@@ -45,7 +51,6 @@ public class ProductService {
         productRepository.deleteById(idProduct);
         return "Xóa thành công";
     }
-
 
 
     public ProductDTO create(Product product) {
