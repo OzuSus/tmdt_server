@@ -36,10 +36,6 @@ public class FavoriteController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<ProductDTO>> getFavoritesByUserId(@PathVariable Integer userId) {
         List<ProductDTO> favoriteProductDTOs = favoriteService.getFavoritesDTOByUserId(userId);
-
-        if (favoriteProductDTOs == null || favoriteProductDTOs.isEmpty()) {
-            return ResponseEntity.badRequest().body(null);
-        }
         return ResponseEntity.ok(favoriteProductDTOs);
     }
 
