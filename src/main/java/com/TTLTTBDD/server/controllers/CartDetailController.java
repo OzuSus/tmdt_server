@@ -39,7 +39,7 @@ public class CartDetailController {
         List<ProductDTO> products = cartDetailService.getProductsInCartByUserId(idUser);
         return ResponseEntity.ok(products);
     }
-    @CrossOrigin(origins = "http://localhost:31415")
+
     @PostMapping("/increase-quantity")
     public ResponseEntity<CartDetailDTO> increaseProductQuantity(
             @RequestParam Integer idUser,
@@ -47,7 +47,7 @@ public class CartDetailController {
         CartDetailDTO updatedCartDetail = cartDetailService.increaseProductQuantity(idUser, idProduct);
         return ResponseEntity.ok(updatedCartDetail);
     }
-    @CrossOrigin(origins = "http://localhost:31415")
+
     @PostMapping("/decrease-quantity")
     public ResponseEntity<String> decreaseProductQuantity(
             @RequestParam Integer idUser,
