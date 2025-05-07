@@ -25,7 +25,7 @@ public class OderDetail {
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
-    @Column(name = "totalprice", nullable = false, length = 50)
-    private Double totalprice;
+    @Column(name = "price", nullable = false)
+    private Double price;
 
 }

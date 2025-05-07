@@ -71,7 +71,7 @@ public class OderService {
             oderDetail.setIdOder(oder);
             oderDetail.setIdProduct(product);
             oderDetail.setQuantity(cartQuantity);
-            oderDetail.setTotalprice(totalPrice.doubleValue());
+            oderDetail.setPrice(totalPrice.doubleValue());
 
             oderDetailRepository.save(oderDetail);
         }
@@ -127,7 +127,7 @@ public class OderService {
                 .idOder(oder.getIdOder().getId())
                 .idProduct(productDTO)
                 .quantity(oder.getQuantity())
-                .totalprice(oder.getTotalprice())
+                .totalprice(oder.getPrice())
                 .build();
     }
 
@@ -173,14 +173,14 @@ public class OderService {
 
         if (existingDetail != null) {
             existingDetail.setQuantity(existingDetail.getQuantity() + quantity);
-            existingDetail.setTotalprice(existingDetail.getTotalprice() + product.getPrize() * quantity);
+            existingDetail.setPrice(existingDetail.getPrice() + product.getPrize() * quantity);
             oderDetailRepository.save(existingDetail);
         } else {
             OderDetail newDetail = new OderDetail();
             newDetail.setIdOder(order);
             newDetail.setIdProduct(product);
             newDetail.setQuantity(quantity);
-            newDetail.setTotalprice(product.getPrize() * quantity);
+            newDetail.setPrice(product.getPrize() * quantity);
             oderDetailRepository.save(newDetail);
         }
     }
@@ -218,7 +218,7 @@ public class OderService {
         }
 
         detail.setQuantity(quantity);
-        detail.setTotalprice(detail.getIdProduct().getPrize() * quantity);
+        detail.setPrice(detail.getIdProduct().getPrize() * quantity);
         oderDetailRepository.save(detail);
     }
 
@@ -241,7 +241,7 @@ public class OderService {
                 .filter(od -> od.getIdOder().getId().equals(orderId))
                 .toList();
         return details.stream()
-                .map(detail -> BigDecimal.valueOf(detail.getTotalprice()))
+                .map(detail -> BigDecimal.valueOf(detail.getPrice()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
@@ -264,7 +264,7 @@ public class OderService {
                     result.put("productName", detail.getIdProduct().getName());
                     result.put("quantity", detail.getQuantity());
                     result.put("unitPrice", BigDecimal.valueOf(detail.getIdProduct().getPrize()));
-                    result.put("totalPrice", BigDecimal.valueOf(detail.getTotalprice()).toPlainString());
+                    result.put("totalPrice", BigDecimal.valueOf(detail.getPrice()).toPlainString());
                     return result;
                 })
                 .collect(Collectors.toList());
@@ -303,7 +303,7 @@ public class OderService {
             orderDetail.setIdOder(newOrder);
             orderDetail.setIdProduct(product);
             orderDetail.setQuantity(productRequest.getQuantity());
-            orderDetail.setTotalprice(totalPrice);
+            orderDetail.setPrice(totalPrice);
             oderDetailRepository.save(orderDetail);
         }
     }

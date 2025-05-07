@@ -31,4 +31,19 @@ public class Oder {
     @JoinColumn(name = "id_status", nullable = false)
     private Status idStatus;
 
+    @Column(name = "fullname")
+    private String fullname;
+
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "totalPrice")
+    private Double totalPrice;
+
 }
