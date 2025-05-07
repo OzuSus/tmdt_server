@@ -1,5 +1,6 @@
 package com.TTLTTBDD.server.services;
 
+import com.TTLTTBDD.server.exception.UserOrProductNotExistException;
 import com.TTLTTBDD.server.models.dto.ProductDTO;
 import com.TTLTTBDD.server.models.entity.Favorite;
 import com.TTLTTBDD.server.models.entity.Product;
@@ -9,6 +10,7 @@ import com.TTLTTBDD.server.repositories.ProductRepository;
 import com.TTLTTBDD.server.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -64,6 +66,16 @@ public class FavoriteServiceImpl implements FavoriteService {
                 .map(Favorite::getIdProduct)
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+    @Override
+    public boolean isProductInWishlist(Integer userId, Integer productId) throws UserOrProductNotExistException {
+        User user = userRepository.findById(userId).orElse(null);
+        Product product = productRepository.findById(productId).orElse(null);
+        if (user == null || product == null) {
+//            return ResponseEntity.badRequest().body("User hoặc Product không tồn tại.");
+            return false;
+        }
+        return favoriteRepository.existsByIdUserAndIdProduct(user, product);
     }
 
     private ProductDTO convertToDTO(Product product) {
