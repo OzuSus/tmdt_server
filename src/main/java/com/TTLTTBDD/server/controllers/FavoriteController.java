@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:31415"})
+@CrossOrigin(origins = {"http://localhost:3000"})
 @RequestMapping("/api/favorites")
 public class FavoriteController {
     @Autowired
@@ -36,10 +36,6 @@ public class FavoriteController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<ProductDTO>> getFavoritesByUserId(@PathVariable Integer userId) {
         List<ProductDTO> favoriteProductDTOs = favoriteService.getFavoritesDTOByUserId(userId);
-
-        if (favoriteProductDTOs == null || favoriteProductDTOs.isEmpty()) {
-            return ResponseEntity.badRequest().body(null);
-        }
         return ResponseEntity.ok(favoriteProductDTOs);
     }
 
