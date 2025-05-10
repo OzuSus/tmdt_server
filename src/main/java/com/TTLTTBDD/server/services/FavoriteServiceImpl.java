@@ -72,7 +72,6 @@ public class FavoriteServiceImpl implements FavoriteService {
         User user = userRepository.findById(userId).orElse(null);
         Product product = productRepository.findById(productId).orElse(null);
         if (user == null || product == null) {
-//            return ResponseEntity.badRequest().body("User hoặc Product không tồn tại.");
             return false;
         }
         return favoriteRepository.existsByIdUserAndIdProduct(user, product);
