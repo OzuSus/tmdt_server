@@ -36,7 +36,7 @@ public class UserController {
     }
 
     @GetMapping("/id")
-    public Optional<UserDTO> getUserById(@RequestParam int id){
+    public Optional<UserDTO> getUserById(@RequestParam int id) {
         return userService.getUserById(id);
     }
 
@@ -74,6 +74,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "internal_error"));
         }
     }
+
     @GetMapping("/check-user")
     public ResponseEntity<?> checkUserExist(
             @RequestParam String username,
@@ -88,6 +89,7 @@ public class UserController {
 
         return ResponseEntity.ok(response);
     }
+
     @PostMapping("/validate-password")
     public ResponseEntity<?> validatePassword(@RequestBody Map<String, String> request) {
         String password = request.get("password");
@@ -103,8 +105,20 @@ public class UserController {
         }
     }
 
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(
+            @RequestParam int idUser,
+            @RequestParam String oldPass,
+            @RequestParam String newPass) {
 
+        boolean result = userService.changePassword(idUser, oldPass, newPass);
 
+        if (!result) {
+            return ResponseEntity.badRequest().body("User không tồn tại hoặc Mật khẩu cũ ko hợp lệ");
+        }
+
+        return ResponseEntity.ok("Đổi mật khẩu thành công!");
+    }
 
     @PutMapping("/updateInfoAccount")
     public UserDTO updateUser(@RequestParam("id") Integer id, @RequestParam("username") String username, @RequestParam("fullname") String fullname, @RequestParam("address") String address, @RequestParam("phone") String phone, @RequestParam("email") String email) {
@@ -157,6 +171,7 @@ public class UserController {
         userService.deleteUser(id);
         return "User with ID " + id + " has been deleted.";
     }
+
     @GetMapping("/verify")
     public RedirectView verifyAccount(@RequestParam("token") String token) {
         Optional<Verifytoken> optionalToken = verifyTokenRepository.findByToken(token);
