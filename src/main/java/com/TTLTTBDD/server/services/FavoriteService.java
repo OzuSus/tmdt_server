@@ -8,5 +8,7 @@ public interface FavoriteService {
     String addFavorite(Integer userId, Integer productId);
     String removeFavoriteByUserIdAndProductId(Integer userId, Integer productId);
     List<ProductDTO> getFavoritesDTOByUserId(Integer userId);
+    boolean isProductInFavorites(Integer userId, Integer productId);
+
 
 }
