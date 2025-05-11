@@ -68,7 +68,7 @@ public class FavoriteServiceImpl implements FavoriteService {
                 .collect(Collectors.toList());
     }
     @Override
-    public boolean isProductInWishlist(Integer userId, Integer productId) throws UserOrProductNotExistException {
+    public boolean isProductInWishlist(Integer userId, Integer productId) {
         User user = userRepository.findById(userId).orElse(null);
         Product product = productRepository.findById(productId).orElse(null);
         if (user == null || product == null) {
