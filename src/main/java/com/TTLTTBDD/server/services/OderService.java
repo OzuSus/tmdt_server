@@ -38,7 +38,7 @@ public class OderService {
     @Autowired
     private UserRepository userRepository;
 
-    public void placeOrder(Integer idUser, Integer idPaymentMethop) {
+    public void placeOrder(Integer idUser, Integer idPaymentMethop, String fullname, String address, String email, String phone, Double totalPrice) {
         Cart cart = cartRepository.findByIdUser_Id(idUser)
                 .orElseThrow(() -> new IllegalArgumentException("Cart không tồn tại cho User này."));
 
@@ -57,6 +57,11 @@ public class OderService {
         oder.setDateOrder(LocalDate.now());
         oder.setIdPaymentMethop(paymentMethop);
         oder.setIdStatus(status);
+        oder.setFullname(fullname);
+        oder.setAddress(address);
+        oder.setEmail(email);
+        oder.setPhone(phone);
+        oder.setTotalPrice(totalPrice);
 
         oderRepository.save(oder);
 
@@ -65,13 +70,13 @@ public class OderService {
             Integer cartQuantity = cartDetail.getQuantity();
 
             BigDecimal price = BigDecimal.valueOf(product.getPrize());
-            BigDecimal totalPrice = price.multiply(BigDecimal.valueOf(cartQuantity));
+            BigDecimal totalPriceInOrderDetail = price.multiply(BigDecimal.valueOf(cartQuantity));
 
             OderDetail oderDetail = new OderDetail();
             oderDetail.setIdOder(oder);
             oderDetail.setIdProduct(product);
             oderDetail.setQuantity(cartQuantity);
-            oderDetail.setPrice(totalPrice.doubleValue());
+            oderDetail.setPrice(totalPriceInOrderDetail.doubleValue());
 
             oderDetailRepository.save(oderDetail);
         }

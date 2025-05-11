@@ -26,9 +26,14 @@ public class OderController {
     @PostMapping("/place")
     public ResponseEntity<?> placeOrder(
             @RequestParam Integer idUser,
-            @RequestParam Integer idPaymentMethop) {
+            @RequestParam Integer idPaymentMethop,
+            @RequestParam String fullname,
+            @RequestParam String address,
+            @RequestParam String email,
+            @RequestParam String phone,
+            @RequestParam Double totalPrice) {
         try {
-            oderService.placeOrder(idUser, idPaymentMethop);
+            oderService.placeOrder(idUser, idPaymentMethop, fullname, address, email, phone, totalPrice);
             return ResponseEntity.ok("Đặt đơn thành công!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
