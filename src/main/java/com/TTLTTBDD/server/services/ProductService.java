@@ -112,4 +112,70 @@ public class ProductService {
         productRepository.save(product);
         return convertToDTO(product);
     }
+    public List<ProductDTO> getProductByRating (double rating) {
+       return productRepository.findByRating(rating).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+    public List<ProductDTO> getProductBetween (double min, double max) {
+        return productRepository.findByPrizeBetween(min,max).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+//    public List<ProductDTO> getFilteredProducts(
+//            Integer idCategory,
+//            Double rating,
+//            Double minPrice,
+//            Double maxPrice,
+//            String sortDirection // "asc" or "desc"
+//    ) {
+//       List<ProductDTO> products = productRepository.findAll().stream()
+//               .map(this::convertToDTO)
+//               .collect(Collectors.toList());
+//        if (idCategory != null) {
+//            products.removeIf(productDTO -> !productDTO.getCategoryID().equals(idCategory));
+//        }
+//        if (rating != null) {
+//            products.removeIf(productDTO -> !productDTO.getRating().equals(rating));
+//        }
+//        if(minPrice != null || maxPrice != null){
+//            products.removeIf(productDTO -> productDTO.getPrice() < minPrice || productDTO.getPrice() > maxPrice);
+//        }
+//        products.sort((a, b) -> {
+//            if (a.getPrice() == null || b.getPrice() == null) return 0;
+//            return "desc".equalsIgnoreCase(sortDirection)
+//                    ? Double.compare(b.getPrice(), a.getPrice())
+//                    : Double.compare(a.getPrice(), b.getPrice());
+//        });
+//        return products;
+//    }
+public List<ProductDTO> getFilteredProducts(
+        Integer idCategory,
+        Double rating,
+        Double minPrice,
+        Double maxPrice,
+        String sortDirection
+) {
+    return productRepository.findAll().stream()
+            .map(this::convertToDTO)
+            .filter(product -> idCategory == null || product.getCategoryID().equals(idCategory))
+            .filter(product -> rating == null || product.getRating().equals(rating))
+            .filter(product -> {
+                Double price = product.getPrice();
+                if (price == null) return false;
+                if (minPrice != null && price < minPrice) return false;
+                return maxPrice == null || price <= maxPrice;
+            })
+            .sorted((a, b) -> {
+                Double priceA = a.getPrice();
+                Double priceB = b.getPrice();
+                if (priceA == null || priceB == null) return 0;
+                return "desc".equalsIgnoreCase(sortDirection)
+                        ? Double.compare(priceB, priceA)
+                        : Double.compare(priceA, priceB);
+            })
+            .collect(Collectors.toList());
+}
+
+
 }
