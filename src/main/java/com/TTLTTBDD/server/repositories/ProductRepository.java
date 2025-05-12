@@ -15,4 +15,9 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     Optional<Product> findProductById(int id);
     List<Product> findByIdCategory_Id(int idCategory);
     List<Product> findByTagIgnoreCase(String tag);
+    List<Product> findByRating(Double rating);
+    List<Product> findByPrizeBetween(double min, double max);
+
+
 }
+

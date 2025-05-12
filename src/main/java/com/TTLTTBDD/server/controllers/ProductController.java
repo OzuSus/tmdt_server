@@ -90,5 +90,25 @@ public class ProductController {
         return productService.deleteProduct(idProduct);
     }
 
+    @GetMapping("/rating")
+    public List<ProductDTO> getProductsByRating(@RequestParam double rating) {
+        return productService.getProductByRating(rating);
+    }
+    @GetMapping("/range")
+    public List<ProductDTO> getProductByPrize(@RequestParam double min, @RequestParam double max) {
+        return productService.getProductBetween(min,max);
+    }
+    @GetMapping("/filter")
+    public List<ProductDTO> getFilteredProducts(
+            @RequestParam(value="idCategory", required = false) Integer idCategory,
+            @RequestParam(value="rating", required = false) Double rating,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(defaultValue = "asc") String sort // "asc" or "desc"
+    ) {
+        return productService.getFilteredProducts(
+                idCategory, rating, minPrice, maxPrice, sort
+        );
+    }
 
 }

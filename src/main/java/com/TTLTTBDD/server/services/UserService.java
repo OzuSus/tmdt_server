@@ -48,7 +48,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<UserDTO> getUserById(int id){
+    public Optional<UserDTO> getUserById(int id) {
         return userRepository.findUsersById(id).map(this::convertToDTO);
     }
 
@@ -187,6 +187,7 @@ public class UserService {
                 .status(user.getStatus())
                 .build();
     }
+
     public void validatePassword(String password) {
         List<String> errors = new ArrayList<>();
 
@@ -205,6 +206,23 @@ public class UserService {
         if (!errors.isEmpty()) {
             throw new PasswordValidationException(errors);
         }
+    }
+
+    public boolean changePassword(int idUser, String oldPass, String newPass) {
+        Optional<User> optionalUser = userRepository.findById(idUser);
+        if (optionalUser.isEmpty()) return false;
+
+        User user = optionalUser.get();
+
+        if (!passwordEncoder.matches(oldPass, user.getPassword())) {
+            return false;
+        }
+
+        // validatePassword(newPass); // đã xử lý ở chỗ khác như bạn nói
+
+        user.setPassword(passwordEncoder.encode(newPass));
+        userRepository.save(user);
+        return true;
     }
 
 }
