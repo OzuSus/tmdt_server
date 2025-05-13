@@ -101,14 +101,14 @@ public class UserService {
 
     }
 
-    public UserDTO updateUserAvata(UserDTO userDTO, MultipartFile avataFile) {
+    public UserDTO updateUserAvatar(UserDTO userDTO, MultipartFile avatarFile) {
         try {
-            if (avataFile != null && !avataFile.isEmpty()) {
-                String avatarPath = loadFile.saveFile(avataFile);
-                userDTO.setAvata(avatarPath);
+            if (avatarFile != null && !avatarFile.isEmpty()) {
+                String avatarPath = loadFile.saveFile(avatarFile);
+                userDTO.setAvatar(avatarPath);
             }
             User user = userRepository.findById(userDTO.getId()).orElseThrow(() -> new RuntimeException("Ko tìm thấy user"));
-            user.setAvata(userDTO.getAvata());
+            user.setAvatar(userDTO.getAvatar());
 
             userRepository.save(user);
             return convertToDTO(user);
@@ -122,7 +122,7 @@ public class UserService {
             // Kiểm tra nếu có avatar mới, nếu không thì không thay đổi avatar trong DB
             if (avataFile != null && !avataFile.isEmpty()) {
                 String avatarPath = loadFile.saveFile(avataFile);  // Lưu avatar mới
-                userDTO.setAvata(avatarPath);  // Cập nhật avatar trong DTO
+                userDTO.setAvatar(avatarPath);  // Cập nhật avatar trong DTO
             }
 
             // Tìm người dùng trong DB và cập nhật thông tin
@@ -138,8 +138,8 @@ public class UserService {
             user.setRole(userDTO.getRole());
 
             // Nếu avatar không được thay đổi, không cần set lại avatar trong DB
-            if (userDTO.getAvata() != null) {
-                user.setAvata(userDTO.getAvata());
+            if (userDTO.getAvatar() != null) {
+                user.setAvatar(userDTO.getAvatar());
             }
 
             // Lưu người dùng đã được cập nhật
@@ -183,7 +183,7 @@ public class UserService {
                 .phone(user.getPhone())
                 .email(user.getEmail())
                 .role(user.getRole())
-                .avata(user.getAvata())
+                .avatar(user.getAvatar())
                 .status(user.getStatus())
                 .build();
     }

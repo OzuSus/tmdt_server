@@ -39,8 +39,8 @@ public class User {
     @Column(name = "role", nullable = false)
     private Boolean role = false;
 
-    @Column(name = "avata", nullable = true)
-    private String avata;
+    @Column(name = "avatar", nullable = true)
+    private String avatar;
 
     @Column(name = "status", nullable = false)
     private Boolean status = false;

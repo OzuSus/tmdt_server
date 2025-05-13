@@ -17,7 +17,7 @@ public class UserDTO {
     private String phone;
     private String email;
     private Boolean role = false;
-    private String avata;
+    private String avatar;
     private Boolean status = false;
 
 }
