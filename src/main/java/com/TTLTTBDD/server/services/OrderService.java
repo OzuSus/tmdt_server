@@ -98,6 +98,10 @@ public class OrderService {
                 .id(oder.getIdStatus().getId())
                 .name(oder.getIdStatus().getName())
                 .build();
+        PaymentMethodDTO paymentMethodDTO = PaymentMethodDTO.builder()
+                .id(oder.getIdPaymentMethop().getId())
+                .type_payment(oder.getIdPaymentMethop().getTypePayment())
+                .build();
         List<OrderDetailDTO> oderDetailDTOList = oderDetailRepository.findByIdOder_Id(oder.getId()).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -107,9 +111,14 @@ public class OrderService {
                 .idOrder(oder.getId())
                 .userId(oder.getIdUser().getId())
                 .dateOrder(oder.getDateOrder())
-                .paymentMethodName(oder.getIdPaymentMethop().getTypePayment())
-                .statusName(statusDTO)
+                .paymentMethod(paymentMethodDTO)
+                .status(statusDTO)
+                .fullname(oder.getFullname())
+                .email(oder.getEmail())
+                .phone(oder.getPhone())
+                .address(oder.getAddress())
                 .orderDetails(oderDetailDTOList)
+                .totalPrice(oder.getTotalPrice())
                 .build();
     }
     private OrderDetailDTO convertToDTO(OrderDetail oder) {
@@ -123,11 +132,13 @@ public class OrderService {
                 .reviewCount(oder.getIdProduct().getReview())
                 .rating(oder.getIdProduct().getRating())
                 .categoryID(oder.getIdProduct().getIdCategory().getId())
+                .tag(oder.getIdProduct().getTag())
+                .jewelerID(oder.getIdProduct().getIdJeweler().getId())
                 .build();
         return OrderDetailDTO.builder()
                 .id(oder.getId())
-                .idOder(oder.getIdOder().getId())
-                .idProduct(productDTO)
+//                .idOder(oder.getIdOder().getId())
+                .Product(productDTO)
                 .quantity(oder.getQuantity())
                 .price(oder.getPrice())
                 .build();

@@ -15,7 +15,13 @@ public class OrderDTO {
     private int idOrder;
     private int userId;
     private LocalDate dateOrder;
-    private String paymentMethodName;
-    private StatusDTO statusName;
+    private PaymentMethodDTO paymentMethod;
+    private StatusDTO status;
+    private String fullname;
+    private String email;
+    private String phone;
+    private String address;
     private List<OrderDetailDTO> orderDetails;
+    private Double totalPrice;
+
 }
