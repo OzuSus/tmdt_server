@@ -16,8 +16,8 @@ public class UserDTO {
     private String address;
     private String phone;
     private String email;
-    private Boolean role = false;
-    private String avata;
+    private Integer roleId = 0;
+    private String avatar;
     private Boolean status = false;
 
 }

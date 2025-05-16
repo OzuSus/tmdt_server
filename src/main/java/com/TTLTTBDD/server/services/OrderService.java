@@ -4,7 +4,6 @@ import com.TTLTTBDD.server.models.dto.*;
 import com.TTLTTBDD.server.models.dto.ProductOrderDTO;
 import com.TTLTTBDD.server.models.entity.*;
 import com.TTLTTBDD.server.repositories.*;
-import lombok.extern.java.Log;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,16 +14,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
-public class OderService {
+public class OrderService {
 
     @Autowired
-    private OderRepository oderRepository;
+    private OrderRepository oderRepository;
     @Autowired
-    private OderDetailRepository oderDetailRepository;
+    private OrderDetailRepository oderDetailRepository;
     @Autowired
     private CartRepository cartRepository;
     @Autowired
@@ -52,7 +49,7 @@ public class OderService {
         Status status = statusRepository.findById(5)
                 .orElseThrow(() -> new IllegalArgumentException("Trạng thái không tồn tại."));
 
-        Oder oder = new Oder();
+        Order oder = new Order();
         oder.setIdUser(cart.getIdUser());
         oder.setDateOrder(LocalDate.now());
         oder.setIdPaymentMethop(paymentMethop);
@@ -72,7 +69,7 @@ public class OderService {
             BigDecimal price = BigDecimal.valueOf(product.getPrize());
             BigDecimal totalPriceInOrderDetail = price.multiply(BigDecimal.valueOf(cartQuantity));
 
-            OderDetail oderDetail = new OderDetail();
+            OrderDetail oderDetail = new OrderDetail();
             oderDetail.setIdOder(oder);
             oderDetail.setIdProduct(product);
             oderDetail.setQuantity(cartQuantity);
@@ -84,24 +81,24 @@ public class OderService {
         cartDetailRepository.deleteAll(cartDetails);
     }
     public List<OrderDTO> getOrdersByUserId(int userId) {
-        List<Oder> orders = oderRepository.findByIdUser_Id(userId);
+        List<Order> orders = oderRepository.findByIdUser_Id(userId);
         return orders.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-    public List<OderDetailDTO> getOrderDetailsByIdOder_Id(int orderId){
-        List<OderDetail> orders = oderDetailRepository.findByIdOder_Id(orderId);
+    public List<OrderDetailDTO> getOrderDetailsByIdOder_Id(int orderId){
+        List<OrderDetail> orders = oderDetailRepository.findByIdOder_Id(orderId);
         return orders.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-    private OrderDTO convertToDTO(Oder oder) {
+    private OrderDTO convertToDTO(Order oder) {
         StatusDTO statusDTO = StatusDTO.builder()
                 .id(oder.getIdStatus().getId())
                 .name(oder.getIdStatus().getName())
                 .build();
-        List<OderDetailDTO> oderDetailDTOList = oderDetailRepository.findByIdOder_Id(oder.getId()).stream()
+        List<OrderDetailDTO> oderDetailDTOList = oderDetailRepository.findByIdOder_Id(oder.getId()).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
         System.out.println("Found " + oderDetailDTOList.size() + " OderDetail(s) for order ID " + oder.getId());
@@ -115,7 +112,7 @@ public class OderService {
                 .orderDetails(oderDetailDTOList)
                 .build();
     }
-    private OderDetailDTO convertToDTO(OderDetail oder) {
+    private OrderDetailDTO convertToDTO(OrderDetail oder) {
         ProductDTO productDTO = ProductDTO.builder()
                 .id(oder.getIdProduct().getId())
                 .name(oder.getIdProduct().getName())
@@ -127,18 +124,18 @@ public class OderService {
                 .rating(oder.getIdProduct().getRating())
                 .categoryID(oder.getIdProduct().getIdCategory().getId())
                 .build();
-        return OderDetailDTO.builder()
+        return OrderDetailDTO.builder()
                 .id(oder.getId())
                 .idOder(oder.getIdOder().getId())
                 .idProduct(productDTO)
                 .quantity(oder.getQuantity())
-                .totalprice(oder.getPrice())
+                .price(oder.getPrice())
                 .build();
     }
 
     // Thêm phương thức này vào OderService
     public Integer getLastOrderId() {
-        Oder lastOrder = oderRepository.findTopByOrderByIdDesc()
+        Order lastOrder = oderRepository.findTopByOrderByIdDesc()
                 .orElseThrow(() -> new IllegalArgumentException("Không có đơn hàng nào trong cơ sở dữ liệu."));
         return lastOrder.getId();
     }
@@ -146,7 +143,7 @@ public class OderService {
 
     // Lấy tất cả orders kèm tổng giá trị
     public List<Map<String, Object>> getAllOrdersWithTotalPrice() {
-        List<Oder> orders = oderRepository.findAll();
+        List<Order> orders = oderRepository.findAll();
         return orders.stream()
                 .map(order -> {
                     Map<String, Object> result = new HashMap<>();
@@ -165,12 +162,12 @@ public class OderService {
 
     // Thêm sản phẩm vào order
     public void addProductToOrder(Integer orderId, Integer productId, Integer quantity) {
-        Oder order = oderRepository.findById(orderId)
+        Order order = oderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order không tồn tại."));
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Sản phẩm không tồn tại."));
 
-        OderDetail existingDetail = oderDetailRepository.findAll()
+        OrderDetail existingDetail = oderDetailRepository.findAll()
                 .stream()
                 .filter(od -> od.getIdOder().getId().equals(orderId) && od.getIdProduct().getId().equals(productId))
                 .findFirst()
@@ -181,7 +178,7 @@ public class OderService {
             existingDetail.setPrice(existingDetail.getPrice() + product.getPrize() * quantity);
             oderDetailRepository.save(existingDetail);
         } else {
-            OderDetail newDetail = new OderDetail();
+            OrderDetail newDetail = new OrderDetail();
             newDetail.setIdOder(order);
             newDetail.setIdProduct(product);
             newDetail.setQuantity(quantity);
@@ -192,7 +189,7 @@ public class OderService {
 
     // Xóa sản phẩm khỏi order
     public void removeProductFromOrder(Integer orderId, Integer productId) {
-        OderDetail detail = oderDetailRepository.findAll()
+        OrderDetail detail = oderDetailRepository.findAll()
                 .stream()
                 .filter(od -> od.getIdOder().getId().equals(orderId) && od.getIdProduct().getId().equals(productId))
                 .findFirst()
@@ -202,7 +199,7 @@ public class OderService {
 
     // Cập nhật trạng thái order
     public void updateOrderStatus(Integer orderId, Integer statusId) {
-        Oder order = oderRepository.findById(orderId)
+        Order order = oderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order không tồn tại."));
         Status status = statusRepository.findById(statusId)
                 .orElseThrow(() -> new IllegalArgumentException("Trạng thái không tồn tại."));
@@ -212,7 +209,7 @@ public class OderService {
 
     // Tăng/giảm số lượng sản phẩm trong order
     public void updateProductQuantity(Integer orderId, Integer productId, Integer quantity) {
-        OderDetail detail = oderDetailRepository.findAll()
+        OrderDetail detail = oderDetailRepository.findAll()
                 .stream()
                 .filter(od -> od.getIdOder().getId().equals(orderId) && od.getIdProduct().getId().equals(productId))
                 .findFirst()
@@ -229,9 +226,9 @@ public class OderService {
 
     // Xóa order
     public void deleteOrder(Integer orderId) {
-        Oder order = oderRepository.findById(orderId)
+        Order order = oderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order không tồn tại."));
-        List<OderDetail> details = oderDetailRepository.findAll()
+        List<OrderDetail> details = oderDetailRepository.findAll()
                 .stream()
                 .filter(od -> od.getIdOder().getId().equals(orderId))
                 .collect(Collectors.toList());
@@ -241,7 +238,7 @@ public class OderService {
 
     // Tính tổng giá trị đơn hàng (không lưu vào DB)
     public BigDecimal calculateOrderTotalPrice(Integer orderId) {
-        List<OderDetail> details = oderDetailRepository.findAll()
+        List<OrderDetail> details = oderDetailRepository.findAll()
                 .stream()
                 .filter(od -> od.getIdOder().getId().equals(orderId))
                 .toList();
@@ -252,11 +249,11 @@ public class OderService {
 
     public List<Map<String, Object>> getAllOrderDetailsByOrderId(Integer orderId) {
         // Kiểm tra xem order có tồn tại không
-        Oder order = oderRepository.findById(orderId)
+        Order order = oderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order không tồn tại."));
 
         // Lấy danh sách chi tiết đơn hàng
-        List<OderDetail> details = oderDetailRepository.findAll()
+        List<OrderDetail> details = oderDetailRepository.findAll()
                 .stream()
                 .filter(od -> od.getIdOder().getId().equals(orderId))
                 .toList();
@@ -284,7 +281,7 @@ public class OderService {
                 .orElseThrow(() -> new IllegalArgumentException("Payment method not found"));
 
         // Tạo Oder mới
-        Oder newOrder = new Oder();
+        Order newOrder = new Order();
         newOrder.setIdUser(user);
         newOrder.setDateOrder(LocalDate.now());
         newOrder.setIdPaymentMethop(paymentMethop);
@@ -304,7 +301,7 @@ public class OderService {
             Double totalPrice = product.getPrize() * productRequest.getQuantity();
 
             // Tạo OderDetail
-            OderDetail orderDetail = new OderDetail();
+            OrderDetail orderDetail = new OrderDetail();
             orderDetail.setIdOder(newOrder);
             orderDetail.setIdProduct(product);
             orderDetail.setQuantity(productRequest.getQuantity());

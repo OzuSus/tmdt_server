@@ -1,9 +1,5 @@
 package com.TTLTTBDD.server.models.dto;
 
-import com.TTLTTBDD.server.models.entity.OderDetail;
-import com.TTLTTBDD.server.models.entity.PaymentMethop;
-import com.TTLTTBDD.server.models.entity.Status;
-import com.TTLTTBDD.server.models.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,5 +17,5 @@ public class OrderDTO {
     private LocalDate dateOrder;
     private String paymentMethodName;
     private StatusDTO statusName;
-    private List<OderDetailDTO> orderDetails;
+    private List<OrderDetailDTO> orderDetails;
 }

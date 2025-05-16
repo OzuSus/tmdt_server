@@ -20,4 +20,5 @@ public class ProductDTO {
     private Double rating;
     private Integer categoryID;
     private String tag;
+    private Integer jewelerID;
 }

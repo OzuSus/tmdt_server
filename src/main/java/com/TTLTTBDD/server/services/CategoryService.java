@@ -1,9 +1,7 @@
 package com.TTLTTBDD.server.services;
 
 import com.TTLTTBDD.server.models.dto.CategoryDTO;
-import com.TTLTTBDD.server.models.dto.UserDTO;
 import com.TTLTTBDD.server.models.entity.Category;
-import com.TTLTTBDD.server.models.entity.User;
 import com.TTLTTBDD.server.repositories.CategotyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
