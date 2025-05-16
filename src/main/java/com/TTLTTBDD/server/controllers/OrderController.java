@@ -1,16 +1,15 @@
 package com.TTLTTBDD.server.controllers;
 
 import com.TTLTTBDD.server.models.dto.OrderRequestDTO;
-import com.TTLTTBDD.server.models.dto.ProductOrderDTO;
-import com.TTLTTBDD.server.models.dto.OderDetailDTO;
+import com.TTLTTBDD.server.models.dto.OrderDetailDTO;
 import com.TTLTTBDD.server.models.dto.OrderDTO;
-import com.TTLTTBDD.server.services.OderService;
+//import com.TTLTTBDD.server.services.OderService;
+import com.TTLTTBDD.server.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.List;
 
 import java.util.Map;
@@ -18,17 +17,22 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/orders")
 @CrossOrigin(origins = "http://localhost:3000")
-public class OderController {
+public class OrderController {
 
     @Autowired
-    private OderService oderService;
+    private OrderService orderService;
 
     @PostMapping("/place")
     public ResponseEntity<?> placeOrder(
             @RequestParam Integer idUser,
-            @RequestParam Integer idPaymentMethop) {
+            @RequestParam Integer idPaymentMethop,
+            @RequestParam String fullname,
+            @RequestParam String address,
+            @RequestParam String email,
+            @RequestParam String phone,
+            @RequestParam Double totalPrice) {
         try {
-            oderService.placeOrder(idUser, idPaymentMethop);
+            orderService.placeOrder(idUser, idPaymentMethop, fullname, address, email, phone, totalPrice);
             return ResponseEntity.ok("Đặt đơn thành công!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -37,12 +41,12 @@ public class OderController {
     }
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<OrderDTO>> getOrdersByUserId(@PathVariable int userId) {
-        List<OrderDTO> orders = oderService.getOrdersByUserId(userId);
+        List<OrderDTO> orders = orderService.getOrdersByUserId(userId);
         return ResponseEntity.ok(orders);
     }
     @GetMapping("/orderDetails/{orderId}")
-    public ResponseEntity<List<OderDetailDTO>> getOrderDetailsByOrderId(@PathVariable int orderId) {
-        List<OderDetailDTO> orders = oderService.getOrderDetailsByIdOder_Id(orderId);
+    public ResponseEntity<List<OrderDetailDTO>> getOrderDetailsByOrderId(@PathVariable int orderId) {
+        List<OrderDetailDTO> orders = orderService.getOrderDetailsByIdOder_Id(orderId);
         return ResponseEntity.ok(orders);
     }
 
@@ -50,7 +54,7 @@ public class OderController {
     @GetMapping
     public ResponseEntity<?> getAllOrdersWithTotalPrice() {
         try {
-            return ResponseEntity.ok(oderService.getAllOrdersWithTotalPrice());
+            return ResponseEntity.ok(orderService.getAllOrdersWithTotalPrice());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -63,18 +67,17 @@ public class OderController {
             @RequestParam Integer productId,
             @RequestParam Integer quantity) {
         try {
-            oderService.addProductToOrder(orderId, productId, quantity);
+            orderService.addProductToOrder(orderId, productId, quantity);
             return ResponseEntity.ok("Thêm sản phẩm thành công!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
-    // Thêm API này vào OderController
     @GetMapping("/latest-id")
     public ResponseEntity<?> getLastOrderId() {
         try {
-            Integer lastOrderId = oderService.getLastOrderId();
+            Integer lastOrderId = orderService.getLastOrderId();
             return ResponseEntity.ok(Map.of("orderId", lastOrderId));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -87,7 +90,7 @@ public class OderController {
             @PathVariable Integer orderId,
             @RequestParam Integer productId) {
         try {
-            oderService.removeProductFromOrder(orderId, productId);
+            orderService.removeProductFromOrder(orderId, productId);
             return ResponseEntity.ok("Xóa sản phẩm thành công!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -100,7 +103,7 @@ public class OderController {
             @PathVariable Integer orderId,
             @RequestParam Integer statusId) {
         try {
-            oderService.updateOrderStatus(orderId, statusId);
+            orderService.updateOrderStatus(orderId, statusId);
             return ResponseEntity.ok("Cập nhật trạng thái thành công!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -114,7 +117,7 @@ public class OderController {
             @RequestParam Integer productId,
             @RequestParam Integer quantity) {
         try {
-            oderService.updateProductQuantity(orderId, productId, quantity);
+            orderService.updateProductQuantity(orderId, productId, quantity);
             return ResponseEntity.ok("Cập nhật số lượng thành công!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -125,7 +128,7 @@ public class OderController {
     @DeleteMapping("/{orderId}")
     public ResponseEntity<?> deleteOrder(@PathVariable Integer orderId) {
         try {
-            oderService.deleteOrder(orderId);
+            orderService.deleteOrder(orderId);
             return ResponseEntity.ok("Xóa đơn hàng thành công!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -135,7 +138,7 @@ public class OderController {
     @GetMapping("/{orderId}/details")
     public ResponseEntity<?> getAllOrderDetails(@PathVariable Integer orderId) {
         try {
-            return ResponseEntity.ok(oderService.getAllOrderDetailsByOrderId(orderId));
+            return ResponseEntity.ok(orderService.getAllOrderDetailsByOrderId(orderId));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -144,7 +147,7 @@ public class OderController {
     @PostMapping("/create")
     public ResponseEntity<String> createOrder(@RequestBody OrderRequestDTO orderRequest) {
         try {
-            oderService.createOrder(orderRequest.getIdUser(), orderRequest.getIdPaymentMethop(), orderRequest.getProducts());
+            orderService.createOrder(orderRequest.getIdUser(), orderRequest.getIdPaymentMethop(), orderRequest.getProducts());
             return ResponseEntity.ok("Order created successfully!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());

@@ -1,13 +1,9 @@
 package com.TTLTTBDD.server.services;
 
 import com.TTLTTBDD.server.models.dto.ProductDTO;
-import com.TTLTTBDD.server.models.dto.UserDTO;
 import com.TTLTTBDD.server.models.entity.Category;
 import com.TTLTTBDD.server.models.entity.Product;
-import com.TTLTTBDD.server.models.entity.User;
 import com.TTLTTBDD.server.repositories.ProductRepository;
-import com.TTLTTBDD.server.repositories.UserRepository;
-import com.TTLTTBDD.server.utils.loadFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -70,6 +66,7 @@ public class ProductService {
                 .reviewCount(product.getReview())
                 .categoryID(product.getIdCategory().getId())
                 .tag(product.getTag())
+                .jewelerID(product.getIdJeweler().getId())
                 .build();
     }
 

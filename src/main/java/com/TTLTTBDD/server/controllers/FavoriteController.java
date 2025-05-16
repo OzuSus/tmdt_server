@@ -39,4 +39,11 @@ public class FavoriteController {
         return ResponseEntity.ok(favoriteProductDTOs);
     }
 
+    @GetMapping("/isInWishList")
+    public ResponseEntity<Boolean> isProductInFavorites(@RequestParam Integer userId, @RequestParam Integer productId) {
+        boolean exists = favoriteService.isProductInFavorites(userId, productId);
+        return ResponseEntity.ok(exists);
+    }
+
+
 }

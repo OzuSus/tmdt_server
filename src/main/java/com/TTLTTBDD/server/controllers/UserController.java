@@ -149,7 +149,7 @@ public class UserController {
             @RequestParam("address") String address,
             @RequestParam("phone") String phone,
             @RequestParam("email") String email,
-            @RequestParam("role") boolean role,
+            @RequestParam("role") Integer role,
             @RequestParam(value = "avataFile", required = false) MultipartFile avataFile) {
 
         UserDTO userDTO = UserDTO.builder()
@@ -159,10 +159,10 @@ public class UserController {
                 .address(address)
                 .phone(phone)
                 .email(email)
-                .role(role)
+                .roleId(role)
                 .build();
 
-        return userService.updateUser(userDTO, avataFile);  // Chuyển file avatar nếu có, nếu không thì null
+        return userService.updateUser(userDTO, avataFile);
     }
 
 

@@ -1,11 +1,7 @@
 package com.TTLTTBDD.server.controllers;
 
-import com.TTLTTBDD.server.models.dto.CategoryDTO;
 import com.TTLTTBDD.server.models.dto.ProductDTO;
-import com.TTLTTBDD.server.models.dto.UserDTO;
 import com.TTLTTBDD.server.models.entity.Category;
-import com.TTLTTBDD.server.models.entity.Product;
-import com.TTLTTBDD.server.models.entity.User;
 import com.TTLTTBDD.server.services.ProductService;
 import com.TTLTTBDD.server.utils.loadFile;
 import org.springframework.beans.factory.annotation.Autowired;
