@@ -9,8 +9,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
-@Table(name = "oders")
-public class Oder {
+@Table(name = "orders")
+public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_oder", nullable = false)
@@ -45,5 +45,9 @@ public class Oder {
 
     @Column(name = "totalPrice")
     private Double totalPrice;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_delivery_methop")
+    private DeliveryMethop idDeliveryMethop;
 
 }
