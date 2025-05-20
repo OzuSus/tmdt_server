@@ -133,12 +133,12 @@ public class UserController {
         return userService.updateUserInfoAccount(userDTO);
     }
 
-    @PutMapping("/updateAvata")
-    public UserDTO updateUser(@RequestParam("id") Integer id, @RequestParam("avataFile") MultipartFile avataFile) {
+    @PutMapping("/updateAvatar")
+    public UserDTO updateUser(@RequestParam("id") Integer id, @RequestParam("avatarFile") MultipartFile avatarFile) {
         UserDTO userDTO = UserDTO.builder()
                 .id(id)
                 .build();
-        return userService.updateUserAvata(userDTO, avataFile);
+        return userService.updateUserAvatar(userDTO, avatarFile);
     }
 
     @PutMapping("/update")
@@ -150,7 +150,7 @@ public class UserController {
             @RequestParam("phone") String phone,
             @RequestParam("email") String email,
             @RequestParam("role") Integer role,
-            @RequestParam(value = "avataFile", required = false) MultipartFile avataFile) {
+            @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile) {
 
         UserDTO userDTO = UserDTO.builder()
                 .id(id)
@@ -162,7 +162,7 @@ public class UserController {
                 .roleId(role)
                 .build();
 
-        return userService.updateUser(userDTO, avataFile);
+        return userService.updateUser(userDTO, avatarFile);
     }
 
 

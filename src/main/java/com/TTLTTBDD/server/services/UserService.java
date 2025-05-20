@@ -107,10 +107,10 @@ public class UserService {
 
     }
 
-    public UserDTO updateUserAvata(UserDTO userDTO, MultipartFile avataFile) {
+    public UserDTO updateUserAvatar(UserDTO userDTO, MultipartFile avatarFile) {
         try {
-            if (avataFile != null && !avataFile.isEmpty()) {
-                String avatarPath = loadFile.saveFile(avataFile);
+            if (avatarFile != null && !avatarFile.isEmpty()) {
+                String avatarPath = loadFile.saveFile(avatarFile);
                 userDTO.setAvatar(avatarPath);
             }
             User user = userRepository.findById(userDTO.getId()).orElseThrow(() -> new RuntimeException("Ko tìm thấy user"));
@@ -123,11 +123,11 @@ public class UserService {
         }
     }
 
-    public UserDTO updateUser(UserDTO userDTO, MultipartFile avataFile) {
+    public UserDTO updateUser(UserDTO userDTO, MultipartFile avatarFile) {
         try {
             // Kiểm tra nếu có avatar mới, nếu không thì không thay đổi avatar trong DB
-            if (avataFile != null && !avataFile.isEmpty()) {
-                String avatarPath = loadFile.saveFile(avataFile);  // Lưu avatar mới
+            if (avatarFile != null && !avatarFile.isEmpty()) {
+                String avatarPath = loadFile.saveFile(avatarFile);  // Lưu avatar mới
                 userDTO.setAvatar(avatarPath);
             }
 
