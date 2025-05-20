@@ -30,10 +30,9 @@ public class OrderController {
             @RequestParam String address,
             @RequestParam String email,
             @RequestParam String phone,
-            @RequestParam Double totalPrice,
             @RequestParam Integer idDeliveryMethop) {
         try {
-            orderService.placeOrder(idUser, idPaymentMethop, fullname, address, email, phone, totalPrice, idDeliveryMethop);
+            orderService.placeOrder(idUser, idPaymentMethop, fullname, address, email, phone, idDeliveryMethop);
             return ResponseEntity.ok("Đặt đơn thành công!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

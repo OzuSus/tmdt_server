@@ -37,7 +37,7 @@ public class OrderService {
     @Autowired
     private DeliveryMethopRepository deliveryMethopRepository;
 
-    public void placeOrder(Integer idUser, Integer idPaymentMethop, String fullname, String address, String email, String phone, Double totalPrice, Integer idDeliveryMethop) {
+    public void placeOrder(Integer idUser, Integer idPaymentMethop, String fullname, String address, String email, String phone, Integer idDeliveryMethop) {
         Cart cart = cartRepository.findByIdUser_Id(idUser)
                 .orElseThrow(() -> new IllegalArgumentException("Cart không tồn tại cho User này."));
         List<CartDetail> cartDetails = cartDetailRepository.findAllByIdCart_Id(cart.getId());
@@ -51,6 +51,17 @@ public class OrderService {
         Status status = statusRepository.findById(5)
                 .orElseThrow(() -> new IllegalArgumentException("Trạng thái không tồn tại."));
 
+        BigDecimal totalProductPrice = BigDecimal.ZERO;
+        for (CartDetail cartDetail : cartDetails) {
+            BigDecimal price = BigDecimal.valueOf(cartDetail.getIdProduct().getPrize());
+            BigDecimal quantity = BigDecimal.valueOf(cartDetail.getQuantity());
+            totalProductPrice = totalProductPrice.add(price.multiply(quantity));
+        }
+
+        // 👉 Cộng thêm phí vận chuyển
+        BigDecimal deliveryPrice = BigDecimal.valueOf(deliveryMethop.getPrice());
+        BigDecimal totalPrice = totalProductPrice.add(deliveryPrice);
+
         Order order = new Order();
         order.setIdUser(cart.getIdUser());
         order.setDateOrder(LocalDate.now());
@@ -60,7 +71,7 @@ public class OrderService {
         order.setAddress(address);
         order.setEmail(email);
         order.setPhone(phone);
-        order.setTotalPrice(totalPrice);
+        order.setTotalPrice(totalPrice.doubleValue());
         order.setIdDeliveryMethop(deliveryMethop);
 
         oderRepository.save(order);
