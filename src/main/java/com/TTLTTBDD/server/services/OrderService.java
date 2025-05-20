@@ -34,33 +34,36 @@ public class OrderService {
     private ProductRepository productRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private DeliveryMethopRepository deliveryMethopRepository;
 
-    public void placeOrder(Integer idUser, Integer idPaymentMethop, String fullname, String address, String email, String phone, Double totalPrice) {
+    public void placeOrder(Integer idUser, Integer idPaymentMethop, String fullname, String address, String email, String phone, Double totalPrice, Integer idDeliveryMethop) {
         Cart cart = cartRepository.findByIdUser_Id(idUser)
                 .orElseThrow(() -> new IllegalArgumentException("Cart không tồn tại cho User này."));
-
         List<CartDetail> cartDetails = cartDetailRepository.findAllByIdCart_Id(cart.getId());
         if (cartDetails.isEmpty()) {
             throw new IllegalArgumentException("Giỏ hàng trống, không thể đặt đơn.");
         }
-
         PaymentMethop paymentMethop = paymentMethopRepository.findById(idPaymentMethop)
                 .orElseThrow(() -> new IllegalArgumentException("Phương thức thanh toán không hợp lệ."));
+        DeliveryMethop deliveryMethop = deliveryMethopRepository.findById(idDeliveryMethop)
+                .orElseThrow(() -> new IllegalArgumentException("Phương thức vận chuyển không hợp lệ."));
         Status status = statusRepository.findById(5)
                 .orElseThrow(() -> new IllegalArgumentException("Trạng thái không tồn tại."));
 
-        Order oder = new Order();
-        oder.setIdUser(cart.getIdUser());
-        oder.setDateOrder(LocalDate.now());
-        oder.setIdPaymentMethop(paymentMethop);
-        oder.setIdStatus(status);
-        oder.setFullname(fullname);
-        oder.setAddress(address);
-        oder.setEmail(email);
-        oder.setPhone(phone);
-        oder.setTotalPrice(totalPrice);
+        Order order = new Order();
+        order.setIdUser(cart.getIdUser());
+        order.setDateOrder(LocalDate.now());
+        order.setIdPaymentMethop(paymentMethop);
+        order.setIdStatus(status);
+        order.setFullname(fullname);
+        order.setAddress(address);
+        order.setEmail(email);
+        order.setPhone(phone);
+        order.setTotalPrice(totalPrice);
+        order.setIdDeliveryMethop(deliveryMethop);
 
-        oderRepository.save(oder);
+        oderRepository.save(order);
 
         for (CartDetail cartDetail : cartDetails) {
             Product product = cartDetail.getIdProduct();
@@ -70,7 +73,7 @@ public class OrderService {
             BigDecimal totalPriceInOrderDetail = price.multiply(BigDecimal.valueOf(cartQuantity));
 
             OrderDetail oderDetail = new OrderDetail();
-            oderDetail.setIdOder(oder);
+            oderDetail.setIdOder(order);
             oderDetail.setIdProduct(product);
             oderDetail.setQuantity(cartQuantity);
             oderDetail.setPrice(totalPriceInOrderDetail.doubleValue());
