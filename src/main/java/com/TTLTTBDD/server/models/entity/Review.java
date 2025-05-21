@@ -13,18 +13,19 @@ import java.time.LocalDate;
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_review")
+    @Column(name = "id_review", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId", referencedColumnName = "id_user", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "userId", nullable = false, referencedColumnName = "id_user")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "productId", referencedColumnName = "id_product", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "productId", nullable = false)
     private Product product;
 
-    @Column(name = "comment", columnDefinition = "TINYTEXT", nullable = false)
+    @Lob
+    @Column(name = "comment", nullable = false)
     private String comment;
 
     @Column(name = "rating_star", nullable = false)
@@ -32,4 +33,5 @@ public class Review {
 
     @Column(name = "date", nullable = false)
     private LocalDate date;
+
 }

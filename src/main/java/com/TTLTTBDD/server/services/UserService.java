@@ -5,12 +5,12 @@ import com.TTLTTBDD.server.exception.UserAlreadyExistsException;
 import com.TTLTTBDD.server.exception.UserNotVerifiedException;
 import com.TTLTTBDD.server.models.dto.UserDTO;
 import com.TTLTTBDD.server.models.entity.Cart;
+import com.TTLTTBDD.server.models.entity.Role;
 import com.TTLTTBDD.server.models.entity.User;
 import com.TTLTTBDD.server.models.entity.Verifytoken;
 import com.TTLTTBDD.server.repositories.*;
 import com.TTLTTBDD.server.utils.loadFile;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +41,8 @@ public class UserService {
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     @Autowired
     private FavoriteRepository favoriteRepository;
+    @Autowired
+    private RoleRepository roleRepository;
 
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
@@ -70,6 +72,10 @@ public class UserService {
         validatePassword(user.getPassword());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setStatus(false);
+
+        Role defaultRole = roleRepository.findById(0).orElseThrow(() -> new RuntimeException("Role mặc định không tồn tại"));
+        user.setRole(defaultRole);
+
         User savedUser = userRepository.save(user);
 
         Cart newCart = new Cart();
@@ -105,10 +111,10 @@ public class UserService {
         try {
             if (avataFile != null && !avataFile.isEmpty()) {
                 String avatarPath = loadFile.saveFile(avataFile);
-                userDTO.setAvata(avatarPath);
+                userDTO.setAvatar(avatarPath);
             }
             User user = userRepository.findById(userDTO.getId()).orElseThrow(() -> new RuntimeException("Ko tìm thấy user"));
-            user.setAvata(userDTO.getAvata());
+            user.setAvatar(userDTO.getAvatar());
 
             userRepository.save(user);
             return convertToDTO(user);
@@ -122,30 +128,28 @@ public class UserService {
             // Kiểm tra nếu có avatar mới, nếu không thì không thay đổi avatar trong DB
             if (avataFile != null && !avataFile.isEmpty()) {
                 String avatarPath = loadFile.saveFile(avataFile);  // Lưu avatar mới
-                userDTO.setAvata(avatarPath);  // Cập nhật avatar trong DTO
+                userDTO.setAvatar(avatarPath);
             }
 
-            // Tìm người dùng trong DB và cập nhật thông tin
             User user = userRepository.findById(userDTO.getId())
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
 
-            // Cập nhật các thông tin khác của người dùng
+            Role role = roleRepository.findById(userDTO.getRoleId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy vai trò (Role)"));
+
             user.setUsername(userDTO.getUsername());
             user.setFullname(userDTO.getFullname());
             user.setAddress(userDTO.getAddress());
             user.setPhone(userDTO.getPhone());
             user.setEmail(userDTO.getEmail());
-            user.setRole(userDTO.getRole());
+            user.setRole(role);
 
-            // Nếu avatar không được thay đổi, không cần set lại avatar trong DB
-            if (userDTO.getAvata() != null) {
-                user.setAvata(userDTO.getAvata());
+            if (userDTO.getAvatar() != null) {
+                user.setAvatar(userDTO.getAvatar());
             }
 
-            // Lưu người dùng đã được cập nhật
             userRepository.save(user);
 
-            // Trả về UserDTO đã cập nhật
             return convertToDTO(user);
         } catch (IOException e) {
             throw new RuntimeException("Lỗi khi tải lên avatar", e);
@@ -157,20 +161,15 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Xóa các bản ghi trong bảng favorite trước
         favoriteRepository.deleteAllByIdUser(user);
 
-        // Tìm Cart của User theo ID
         Optional<Cart> cartOptional = cartRepository.findByIdUser_Id(user.getId());
         if (cartOptional.isPresent()) {
-            // Xóa CartDetail liên quan đến Cart
             cartDetailRepository.deleteAllByIdCart(cartOptional.get());
 
-            // Xóa Cart
             cartRepository.delete(cartOptional.get());
         }
 
-        // Cuối cùng xóa User
         userRepository.delete(user);
     }
 
@@ -182,8 +181,8 @@ public class UserService {
                 .address(user.getAddress())
                 .phone(user.getPhone())
                 .email(user.getEmail())
-                .role(user.getRole())
-                .avata(user.getAvata())
+                .roleId(user.getRole().getId())
+                .avatar(user.getAvatar())
                 .status(user.getStatus())
                 .build();
     }

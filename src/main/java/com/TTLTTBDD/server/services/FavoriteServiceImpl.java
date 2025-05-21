@@ -65,6 +65,16 @@ public class FavoriteServiceImpl implements FavoriteService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+    @Override
+    public boolean isProductInFavorites(Integer userId, Integer productId) {
+        User user = userRepository.findById(userId).orElse(null);
+        Product product = productRepository.findById(productId).orElse(null);
+        if (user == null || product == null) {
+            return false;
+        }
+        return favoriteRepository.existsByIdUserAndIdProduct(user, product);
+    }
+
 
     private ProductDTO convertToDTO(Product product) {
         if (product == null) return null;
@@ -78,6 +88,7 @@ public class FavoriteServiceImpl implements FavoriteService {
                 .rating(product.getRating())
                 .reviewCount(product.getReview())
                 .categoryID(product.getIdCategory().getId())
+                .jewelerID(product.getIdJeweler().getId())
                 .build();
     }
 }

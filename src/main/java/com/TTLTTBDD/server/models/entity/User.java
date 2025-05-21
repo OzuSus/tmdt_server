@@ -1,11 +1,8 @@
 package com.TTLTTBDD.server.models.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
-import org.antlr.v4.runtime.misc.NotNull;
 
 @Getter
 @Setter
@@ -20,8 +17,7 @@ public class User {
     @Column(name = "username", nullable = false, length = 50)
     private String username;
 
-    @NotNull
-    @Column(name = "password", nullable = false, length = 255)
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "fullname", nullable = false, length = 50)
@@ -36,14 +32,15 @@ public class User {
     @Column(name = "address", nullable = false, length = 100)
     private String address;
 
-    @Column(name = "role", nullable = false)
-    private Boolean role = false;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "roleId", nullable = false)
+    private Role role;
 
-    @Column(name = "avata", nullable = true)
-    private String avata;
+    @Column(name = "avatar")
+    private String avatar;
 
-    @Column(name = "status", nullable = false)
-    private Boolean status = false;
+    @Column(name = "status")
+    private Boolean status;
 
 
 }
