@@ -4,6 +4,7 @@ import com.TTLTTBDD.server.models.dto.OrderRequestDTO;
 import com.TTLTTBDD.server.models.dto.OrderDetailDTO;
 import com.TTLTTBDD.server.models.dto.OrderDTO;
 //import com.TTLTTBDD.server.services.OderService;
+import com.TTLTTBDD.server.models.dto.StatusDTO;
 import com.TTLTTBDD.server.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -153,6 +154,16 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
     }
+    @GetMapping("/statuses")
+    public ResponseEntity<List<StatusDTO>> getAllStatuses() {
+        List<StatusDTO> statuses = orderService.getAllStatuses();
+        return ResponseEntity.ok(statuses);
+    }
 
+    @GetMapping("/filter-by-status/{statusId}")
+    public ResponseEntity<List<OrderDTO>> getOrdersByStatus(@PathVariable Integer statusId) {
+        List<OrderDTO> orders = orderService.getOrdersByStatus(statusId);
+        return ResponseEntity.ok(orders);
+    }
 }
 

@@ -320,4 +320,23 @@ public class OrderService {
             oderDetailRepository.save(orderDetail);
         }
     }
+    public List<StatusDTO> getAllStatuses() {
+        List<Status> statuses = statusRepository.findAll();
+        return statuses.stream()
+                .map(status -> StatusDTO.builder()
+                        .id(status.getId())
+                        .name(status.getName())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public List<OrderDTO> getOrdersByStatus(Integer statusId) {
+        Status status = statusRepository.findById(statusId)
+                .orElseThrow(() -> new IllegalArgumentException("Status not found with id: " + statusId));
+
+        List<Order> orders = oderRepository.findByIdStatus_Id(statusId);
+        return orders.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
 }
