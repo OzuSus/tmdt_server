@@ -1,12 +1,12 @@
 package com.TTLTTBDD.server.controllers;
 
 import com.TTLTTBDD.server.models.dto.ReviewRequestDTO;
+import com.TTLTTBDD.server.models.dto.ReviewResponseDTO;
 import com.TTLTTBDD.server.models.entity.Review;
 import com.TTLTTBDD.server.services.ProductService;
 import com.TTLTTBDD.server.services.ReviewService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,42 +25,45 @@ public class ReviewController {
     }
 
     @GetMapping("/product/{productId}")
-    public ResponseEntity<List<Review>> getReviewsByProduct(@PathVariable Integer productId) {
+    public ResponseEntity<List<ReviewResponseDTO>> getReviewsByProduct(@PathVariable Integer productId) {
         return ResponseEntity.ok(reviewService.getReviewsByProductId(productId));
     }
 
-    @GetMapping("/check")
-    public ResponseEntity<Boolean> checkUserPurchased(
-            @RequestParam Integer userId,
-            @RequestParam Integer productId
-    ) {
+    @GetMapping("/check-purchased")
+    public ResponseEntity<Boolean> checkUserPurchased(@RequestParam Integer userId, @RequestParam Integer productId) {
         boolean hasPurchased = reviewService.hasUserPurchasedProduct(userId, productId);
         return ResponseEntity.ok(hasPurchased);
     }
 
-    @PostMapping("/write")
-    public ResponseEntity<?> writeReview(@RequestBody ReviewRequestDTO reviewRequestDTO) {
-        // Kiểm tra user đã mua sản phẩm chưa
-        boolean hasPurchased = reviewService.hasUserPurchasedProduct(
-                reviewRequestDTO.getUserId(),
-                reviewRequestDTO.getProductId()
-        );
+    @GetMapping("/check-reviewed")
+    public ResponseEntity<Boolean> checkUserReviewed(@RequestParam Integer userId, @RequestParam Integer productId) {
+        boolean hasReviewed = reviewService.hasUserReviewedProduct(userId, productId);
+        return ResponseEntity.ok(hasReviewed);
+    }
 
-        if (!hasPurchased) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User has not purchased this product");
+    @PostMapping("/write")
+    public ResponseEntity<?> writeReview(@RequestBody ReviewRequestDTO dto) {
+        // Kiểm tra đã mua chưa
+        if (!reviewService.hasUserPurchasedProduct(dto.getUserId(), dto.getProductId())) {
+            return ResponseEntity.badRequest().body("User chưa mua sản phẩm này.");
         }
 
+        // Kiểm tra đã review chưa
+        if (reviewService.hasUserReviewedProduct(dto.getUserId(), dto.getProductId())) {
+            return ResponseEntity.badRequest().body("User đã review sản phẩm này rồi.");
+        }
 
         Review review = reviewService.writeReview(
-                reviewRequestDTO.getUserId(),
-                reviewRequestDTO.getProductId(),
-                reviewRequestDTO.getComment(),
-                reviewRequestDTO.getRating()
+                dto.getUserId(),
+                dto.getProductId(),
+                dto.getComment(),
+                dto.getRating()
         );
 
         // Cập nhật lại rating sản phẩm
-        productService.updateProductRating(reviewRequestDTO.getProductId());
+        productService.updateProductRating(dto.getProductId());
 
-        return ResponseEntity.ok(review);
+        // Có thể trả về đơn giản như sau:
+        return ResponseEntity.ok("Review thành công!");
     }
 }

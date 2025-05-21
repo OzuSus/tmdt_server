@@ -1,5 +1,6 @@
 package com.TTLTTBDD.server.services;
 
+import com.TTLTTBDD.server.models.dto.ReviewResponseDTO;
 import com.TTLTTBDD.server.models.entity.Product;
 import com.TTLTTBDD.server.models.entity.Review;
 import com.TTLTTBDD.server.repositories.*;
@@ -9,29 +10,49 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
-    private final OderDetailRepository orderDetailRepository;
+    private final OrderDetailRepository orderDetailRepository;
 
     @Autowired
-    public ReviewService(ReviewRepository reviewRepository, UserRepository userRepository, ProductRepository productRepository, OderDetailRepository orderDetailRepository) {
+    public ReviewService(ReviewRepository reviewRepository, UserRepository userRepository, ProductRepository productRepository, OrderDetailRepository orderDetailRepository) {
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.orderDetailRepository = orderDetailRepository;
     }
 
-    public List<Review> getReviewsByProductId(Integer productId) {
-        return reviewRepository.findByProductId(productId);
+    public List<ReviewResponseDTO> getReviewsByProductId(Integer productId) {
+        List<Review> reviews = reviewRepository.findByProductId(productId);
+        List<ReviewResponseDTO> result = new ArrayList<>();
+
+        for (Review review : reviews) {
+            ReviewResponseDTO responseDTO = new ReviewResponseDTO();
+            responseDTO.setId(review.getId());
+            responseDTO.setComment(review.getComment());
+            responseDTO.setRating(review.getRatingStar());
+            responseDTO.setUserName(review.getUser().getUsername());
+            responseDTO.setCreatedAt(review.getDate());
+            result.add(responseDTO);
+        }
+
+        return result;
     }
 
     public boolean hasUserPurchasedProduct(Integer userId, Integer productId) {
         return orderDetailRepository.hasUserPurchasedProduct(userId, productId);
+    }
+
+    public boolean hasUserReviewedProduct(Integer userId, Integer productId) {
+        return reviewRepository.hasUserReviewedProduct(userId, productId);
     }
 
     @Transactional
