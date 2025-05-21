@@ -3,6 +3,7 @@ package com.TTLTTBDD.server.controllers;
 import com.TTLTTBDD.server.models.dto.ReviewRequestDTO;
 import com.TTLTTBDD.server.models.dto.ReviewResponseDTO;
 import com.TTLTTBDD.server.models.entity.Review;
+import com.TTLTTBDD.server.services.OrderService;
 import com.TTLTTBDD.server.services.ProductService;
 import com.TTLTTBDD.server.services.ReviewService;
 
@@ -17,22 +18,18 @@ import java.util.List;
 public class ReviewController {
     private final ReviewService reviewService;
     private final ProductService productService;
+    private final OrderService orderService;
 
     @Autowired
-    public ReviewController(ReviewService reviewService, ProductService productService) {
+    public ReviewController(ReviewService reviewService, ProductService productService, OrderService orderService) {
         this.reviewService = reviewService;
         this.productService = productService;
+        this.orderService = orderService;
     }
 
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<ReviewResponseDTO>> getReviewsByProduct(@PathVariable Integer productId) {
         return ResponseEntity.ok(reviewService.getReviewsByProductId(productId));
-    }
-
-    @GetMapping("/check-purchased")
-    public ResponseEntity<Boolean> checkUserPurchased(@RequestParam Integer userId, @RequestParam Integer productId) {
-        boolean hasPurchased = reviewService.hasUserPurchasedProduct(userId, productId);
-        return ResponseEntity.ok(hasPurchased);
     }
 
     @GetMapping("/check-reviewed")
@@ -43,8 +40,13 @@ public class ReviewController {
 
     @PostMapping("/write")
     public ResponseEntity<?> writeReview(@RequestBody ReviewRequestDTO dto) {
+        // Kiểm tra rating phải nằm trong khoảng 1 đến 5
+        if (dto.getRating() < 1 || dto.getRating() > 5) {
+            return ResponseEntity.badRequest().body("Số sao đánh giá phải từ 1 đến 5.");
+        }
+        
         // Kiểm tra đã mua chưa
-        if (!reviewService.hasUserPurchasedProduct(dto.getUserId(), dto.getProductId())) {
+        if (!orderService.hasUserPurchasedProduct(dto.getUserId(), dto.getProductId())) {
             return ResponseEntity.badRequest().body("User chưa mua sản phẩm này.");
         }
 

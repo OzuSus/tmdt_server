@@ -11,23 +11,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ReviewService {
+    private final OrderService orderService;
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
-    private final OrderDetailRepository orderDetailRepository;
 
     @Autowired
-    public ReviewService(ReviewRepository reviewRepository, UserRepository userRepository, ProductRepository productRepository, OrderDetailRepository orderDetailRepository) {
+    public ReviewService(OrderService orderService, ReviewRepository reviewRepository, UserRepository userRepository, ProductRepository productRepository, OrderDetailRepository orderDetailRepository) {
+        this.orderService = orderService;
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
-        this.orderDetailRepository = orderDetailRepository;
     }
 
     public List<ReviewResponseDTO> getReviewsByProductId(Integer productId) {
@@ -47,17 +45,13 @@ public class ReviewService {
         return result;
     }
 
-    public boolean hasUserPurchasedProduct(Integer userId, Integer productId) {
-        return orderDetailRepository.hasUserPurchasedProduct(userId, productId);
-    }
-
     public boolean hasUserReviewedProduct(Integer userId, Integer productId) {
-        return reviewRepository.hasUserReviewedProduct(userId, productId);
+        return reviewRepository.existsByUserIdAndProductId(userId, productId);
     }
 
     @Transactional
     public Review writeReview(Integer userId, Integer productId, String comment, Integer rating) {
-        if (!hasUserPurchasedProduct(userId, productId)) {
+        if (!orderService.hasUserPurchasedProduct(userId, productId)) {
             throw new IllegalStateException("User has not purchased this product");
         }
 
