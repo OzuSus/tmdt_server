@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class VNPayRequest {
     private Long amount;
-    private Long orderId;
+    private String content;
 
 }

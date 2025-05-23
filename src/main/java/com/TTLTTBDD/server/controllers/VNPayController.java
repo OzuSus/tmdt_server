@@ -23,7 +23,7 @@ public class VNPayController {
     public ResponseEntity<String> createPayment(@RequestBody VNPayRequest request) {
         try {
             Long amount = request.getAmount();
-            Long orderId = request.getOrderId();
+            String content = request.getContent();
 
             String vnp_TxnRef = String.valueOf(System.currentTimeMillis());
             String vnp_OrderInfo = "PlaceOrder" + vnp_TxnRef;
