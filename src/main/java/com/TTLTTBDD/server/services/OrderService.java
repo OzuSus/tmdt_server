@@ -326,7 +326,7 @@ public class OrderService {
     }
 
     public boolean hasUserPurchasedProduct(Integer userId, Integer productId) {
-        // status là 6: Đã xác nhận
-        return oderDetailRepository.hasUserPurchasedProduct(userId, productId, 6);
+        // status là 8: Đã giao hàng
+        return oderDetailRepository.hasUserPurchasedProduct(userId, productId, 8);
     }
 }
