@@ -123,11 +123,12 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    public void updateProductRating(Integer productId) {
+    public void updateProductRatingAndNumReview(Integer productId) {
         List<Review> reviews = reviewRepository.findByProductId(productId);
         double average = reviews.stream().mapToInt(Review::getRatingStar).average().orElse(4);
         Product product = productRepository.findById(productId).orElseThrow();
         product.setRating(average);
+        product.setReview(reviews.size());
         productRepository.save(product);
     }
 

@@ -45,7 +45,7 @@ public class ReviewController {
         if (dto.getRating() < 1 || dto.getRating() > 5) {
             return ResponseEntity.badRequest().body("Số sao đánh giá phải từ 1 đến 5.");
         }
-        
+
         // Kiểm tra đã mua chưa
         if (!orderService.hasUserPurchasedProduct(dto.getUserId(), dto.getProductId())) {
             return ResponseEntity.badRequest().body("User chưa mua sản phẩm này.");
@@ -63,8 +63,8 @@ public class ReviewController {
                 dto.getRating()
         );
 
-        // Cập nhật lại rating sản phẩm
-        productService.updateProductRating(dto.getProductId());
+        // Cập nhật lại rating và số lượng review sản phẩm
+        productService.updateProductRatingAndNumReview(dto.getProductId());
 
         // Có thể trả về đơn giản như sau:
         return ResponseEntity.ok("Review thành công!");
