@@ -330,11 +330,11 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    public List<OrderDTO> getOrdersByStatus(Integer statusId) {
+    public List<OrderDTO> getOrdersByStatusAndUser(Integer statusId, Integer userId) {
         Status status = statusRepository.findById(statusId)
                 .orElseThrow(() -> new IllegalArgumentException("Status not found with id: " + statusId));
 
-        List<Order> orders = oderRepository.findByIdStatus_Id(statusId);
+        List<Order> orders = oderRepository.findByIdStatus_IdAndIdUser_Id(statusId, userId);
         return orders.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());

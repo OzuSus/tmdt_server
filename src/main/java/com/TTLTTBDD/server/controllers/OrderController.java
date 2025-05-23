@@ -160,9 +160,11 @@ public class OrderController {
         return ResponseEntity.ok(statuses);
     }
 
-    @GetMapping("/filter-by-status/{statusId}")
-    public ResponseEntity<List<OrderDTO>> getOrdersByStatus(@PathVariable Integer statusId) {
-        List<OrderDTO> orders = orderService.getOrdersByStatus(statusId);
+    @GetMapping("/filter-by-status/{statusId}/{userId}")
+    public ResponseEntity<List<OrderDTO>> getOrdersByStatusAndUser(
+            @PathVariable Integer statusId,
+            @PathVariable Integer userId) {
+        List<OrderDTO> orders = orderService.getOrdersByStatusAndUser(statusId, userId);
         return ResponseEntity.ok(orders);
     }
 }
