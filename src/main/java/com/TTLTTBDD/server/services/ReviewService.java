@@ -1,7 +1,6 @@
 package com.TTLTTBDD.server.services;
 
 import com.TTLTTBDD.server.models.dto.ReviewResponseDTO;
-import com.TTLTTBDD.server.models.entity.Product;
 import com.TTLTTBDD.server.models.entity.Review;
 import com.TTLTTBDD.server.repositories.*;
 
@@ -15,14 +14,12 @@ import java.util.List;
 
 @Service
 public class ReviewService {
-    private final OrderService orderService;
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
     @Autowired
-    public ReviewService(OrderService orderService, ReviewRepository reviewRepository, UserRepository userRepository, ProductRepository productRepository, OrderDetailRepository orderDetailRepository) {
-        this.orderService = orderService;
+    public ReviewService(ReviewRepository reviewRepository, UserRepository userRepository, ProductRepository productRepository) {
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
@@ -51,10 +48,6 @@ public class ReviewService {
 
     @Transactional
     public Review writeReview(Integer userId, Integer productId, String comment, Integer rating) {
-        if (!orderService.hasUserPurchasedProduct(userId, productId)) {
-            throw new IllegalStateException("User has not purchased this product");
-        }
-
         Review review = new Review();
         review.setUser(userRepository.findById(userId).orElseThrow());
         review.setProduct(productRepository.findById(productId).orElseThrow());
@@ -63,17 +56,6 @@ public class ReviewService {
         review.setDate(LocalDate.now());
         Review saved = reviewRepository.save(review);
 
-        updateProductRating(productId);
         return saved;
-    }
-
-    public void updateProductRating(Integer productId) {
-        List<Review> reviews = reviewRepository.findByProductId(productId);
-        double avg = reviews.stream().mapToInt(Review::getRatingStar).average().orElse(0.0);
-
-        Product product = productRepository.findById(productId).orElseThrow();
-        product.setRating(avg);
-        product.setReview(reviews.size());
-        productRepository.save(product);
     }
 }
