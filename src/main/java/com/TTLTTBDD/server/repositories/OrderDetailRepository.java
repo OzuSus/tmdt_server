@@ -11,10 +11,23 @@ import java.util.List;
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Integer> {
     List<OrderDetail> findByIdOder_Id(int orderId);
 
+//    @Query("SELECT CASE WHEN COUNT(od) > 0 THEN true ELSE false END " +
+//            "FROM OrderDetail od " +
+//            "JOIN od.idOder o " +
+//            "WHERE o.idUser.id = :userId AND od.idProduct.id = :productId")
+//    boolean hasUserPurchasedProduct(@Param("userId") Integer userId, @Param("productId") Integer productId);
+
     @Query("SELECT CASE WHEN COUNT(od) > 0 THEN true ELSE false END " +
             "FROM OrderDetail od " +
             "JOIN od.idOder o " +
-            "WHERE o.idUser.id = :userId AND od.idProduct.id = :productId")
-    boolean hasUserPurchasedProduct(@Param("userId") Integer userId, @Param("productId") Integer productId);
+            "WHERE o.idUser.id = :userId " +
+            "AND od.idProduct.id = :productId " +
+            "AND o.idStatus.id = :statusId")
+    boolean hasUserPurchasedProduct(
+            @Param("userId") Integer userId,
+            @Param("productId") Integer productId,
+            @Param("statusId") Integer statusId
+    );
+
 
 }
