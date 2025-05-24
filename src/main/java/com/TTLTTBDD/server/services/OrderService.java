@@ -324,9 +324,27 @@ public class OrderService {
             oderDetailRepository.save(orderDetail);
         }
     }
-
     public boolean hasUserPurchasedProduct(Integer userId, Integer productId) {
         // status là 8: Đã giao hàng
         return oderDetailRepository.hasUserPurchasedProduct(userId, productId, 8);
+    }
+    public List<StatusDTO> getAllStatuses() {
+        List<Status> statuses = statusRepository.findAll();
+        return statuses.stream()
+                .map(status -> StatusDTO.builder()
+                        .id(status.getId())
+                        .name(status.getName())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public List<OrderDTO> getOrdersByStatusAndUser(Integer statusId, Integer userId) {
+        Status status = statusRepository.findById(statusId)
+                .orElseThrow(() -> new IllegalArgumentException("Status not found with id: " + statusId));
+
+        List<Order> orders = oderRepository.findByIdStatus_IdAndIdUser_Id(statusId, userId);
+        return orders.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 }
