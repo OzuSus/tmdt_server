@@ -3,7 +3,9 @@ package com.TTLTTBDD.server.services;
 import com.TTLTTBDD.server.models.dto.ProductDTO;
 import com.TTLTTBDD.server.models.entity.Category;
 import com.TTLTTBDD.server.models.entity.Product;
+import com.TTLTTBDD.server.models.entity.Review;
 import com.TTLTTBDD.server.repositories.ProductRepository;
+import com.TTLTTBDD.server.repositories.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +16,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
+    private final ProductRepository productRepository;
+    private final ReviewRepository reviewRepository;
+
     @Autowired
-    private ProductRepository productRepository;
+    public ProductService(ProductRepository productRepository, ReviewRepository reviewRepository) {
+        this.productRepository = productRepository;
+        this.reviewRepository = reviewRepository;
+    }
 
     public List<ProductDTO> getAllProducts() {
         return productRepository.findAll().stream()
@@ -66,7 +74,6 @@ public class ProductService {
                 .reviewCount(product.getReview())
                 .categoryID(product.getIdCategory().getId())
                 .tag(product.getTag())
-                .jewelerID(product.getIdJeweler().getId())
                 .build();
     }
 
@@ -109,17 +116,29 @@ public class ProductService {
         productRepository.save(product);
         return convertToDTO(product);
     }
-    public List<ProductDTO> getProductByRating (double rating) {
-       return productRepository.findByRating(rating).stream()
+
+    public List<ProductDTO> getProductByRating(double rating) {
+        return productRepository.findByRating(rating).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-    public List<ProductDTO> getProductBetween (double min, double max) {
-        return productRepository.findByPrizeBetween(min,max).stream()
+
+    public void updateProductRatingAndNumReview(Integer productId) {
+        List<Review> reviews = reviewRepository.findByProductId(productId);
+        double average = reviews.stream().mapToInt(Review::getRatingStar).average().orElse(4);
+        Product product = productRepository.findById(productId).orElseThrow();
+        product.setRating(average);
+        product.setReview(reviews.size());
+        productRepository.save(product);
+    }
+
+    public List<ProductDTO> getProductBetween(double min, double max) {
+        return productRepository.findByPrizeBetween(min, max).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-//    public List<ProductDTO> getFilteredProducts(
+
+    //    public List<ProductDTO> getFilteredProducts(
 //            Integer idCategory,
 //            Double rating,
 //            Double minPrice,
@@ -146,33 +165,33 @@ public class ProductService {
 //        });
 //        return products;
 //    }
-public List<ProductDTO> getFilteredProducts(
-        Integer idCategory,
-        Double rating,
-        Double minPrice,
-        Double maxPrice,
-        String sortDirection
-) {
-    return productRepository.findAll().stream()
-            .map(this::convertToDTO)
-            .filter(product -> idCategory == null || product.getCategoryID().equals(idCategory))
-            .filter(product -> rating == null || product.getRating().equals(rating))
-            .filter(product -> {
-                Double price = product.getPrice();
-                if (price == null) return false;
-                if (minPrice != null && price < minPrice) return false;
-                return maxPrice == null || price <= maxPrice;
-            })
-            .sorted((a, b) -> {
-                Double priceA = a.getPrice();
-                Double priceB = b.getPrice();
-                if (priceA == null || priceB == null) return 0;
-                return "desc".equalsIgnoreCase(sortDirection)
-                        ? Double.compare(priceB, priceA)
-                        : Double.compare(priceA, priceB);
-            })
-            .collect(Collectors.toList());
-}
+    public List<ProductDTO> getFilteredProducts(
+            Integer idCategory,
+            Double rating,
+            Double minPrice,
+            Double maxPrice,
+            String sortDirection
+    ) {
+        return productRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .filter(product -> idCategory == null || product.getCategoryID().equals(idCategory))
+                .filter(product -> rating == null || product.getRating().equals(rating))
+                .filter(product -> {
+                    Double price = product.getPrice();
+                    if (price == null) return false;
+                    if (minPrice != null && price < minPrice) return false;
+                    return maxPrice == null || price <= maxPrice;
+                })
+                .sorted((a, b) -> {
+                    Double priceA = a.getPrice();
+                    Double priceB = b.getPrice();
+                    if (priceA == null || priceB == null) return 0;
+                    return "desc".equalsIgnoreCase(sortDirection)
+                            ? Double.compare(priceB, priceA)
+                            : Double.compare(priceA, priceB);
+                })
+                .collect(Collectors.toList());
+    }
 
 
 }
