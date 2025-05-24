@@ -80,13 +80,15 @@ public class OrderService {
 
         cartDetailRepository.deleteAll(cartDetails);
     }
+
     public List<OrderDTO> getOrdersByUserId(int userId) {
         List<Order> orders = oderRepository.findByIdUser_Id(userId);
         return orders.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-    public List<OrderDetailDTO> getOrderDetailsByIdOder_Id(int orderId){
+
+    public List<OrderDetailDTO> getOrderDetailsByIdOder_Id(int orderId) {
         List<OrderDetail> orders = oderDetailRepository.findByIdOder_Id(orderId);
         return orders.stream()
                 .map(this::convertToDTO)
@@ -121,6 +123,7 @@ public class OrderService {
                 .totalPrice(oder.getTotalPrice())
                 .build();
     }
+
     private OrderDetailDTO convertToDTO(OrderDetail oder) {
         ProductDTO productDTO = ProductDTO.builder()
                 .id(oder.getIdProduct().getId())
@@ -272,8 +275,9 @@ public class OrderService {
         return details.stream()
                 .map(detail -> {
                     Map<String, Object> result = new HashMap<>();
-                    result.put("orderDetailId",detail.getId());result.put("orderId",order.getId());
-                    result.put("productId",detail.getIdProduct().getId());
+                    result.put("orderDetailId", detail.getId());
+                    result.put("orderId", order.getId());
+                    result.put("productId", detail.getIdProduct().getId());
                     result.put("productName", detail.getIdProduct().getName());
                     result.put("quantity", detail.getQuantity());
                     result.put("unitPrice", BigDecimal.valueOf(detail.getIdProduct().getPrize()));
@@ -319,6 +323,10 @@ public class OrderService {
             orderDetail.setPrice(totalPrice);
             oderDetailRepository.save(orderDetail);
         }
+    }
+    public boolean hasUserPurchasedProduct(Integer userId, Integer productId) {
+        // status là 8: Đã giao hàng
+        return oderDetailRepository.hasUserPurchasedProduct(userId, productId, 8);
     }
     public List<StatusDTO> getAllStatuses() {
         List<Status> statuses = statusRepository.findAll();
