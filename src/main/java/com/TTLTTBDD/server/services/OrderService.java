@@ -342,6 +342,18 @@ public class OrderService {
         // status là 8: Đã giao hàng
         return oderDetailRepository.hasUserPurchasedProduct(userId, productId, 8);
     }
+    public List<OrderDTO> getAllOrders() {
+        List<Order> orders = oderRepository.findAll();
+        return orders.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+    public List<OrderDTO> getOrdersByStatus_Id(Integer statusId) {
+        List<Order> orders = oderRepository.findByIdStatus_Id(statusId);
+        return orders.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
     public List<StatusDTO> getAllStatuses() {
         List<Status> statuses = statusRepository.findAll();
         return statuses.stream()
