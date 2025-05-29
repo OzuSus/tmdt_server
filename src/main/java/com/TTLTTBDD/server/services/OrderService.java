@@ -118,6 +118,13 @@ public class OrderService {
                 .id(oder.getIdPaymentMethop().getId())
                 .type_payment(oder.getIdPaymentMethop().getTypePayment())
                 .build();
+        DeliveryMethopDTO deliveryMethopDTO = null;
+        if (oder.getIdDeliveryMethop() != null) {
+             deliveryMethopDTO = DeliveryMethopDTO.builder()
+                    .id(oder.getIdDeliveryMethop().getId())
+                    .name(oder.getIdDeliveryMethop().getName())
+                    .build();
+        }
         List<OrderDetailDTO> oderDetailDTOList = oderDetailRepository.findByIdOder_Id(oder.getId()).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -135,6 +142,7 @@ public class OrderService {
                 .address(oder.getAddress())
                 .orderDetails(oderDetailDTOList)
                 .totalPrice(oder.getTotalPrice())
+                .deliveryMethop(deliveryMethopDTO)
                 .build();
     }
 
