@@ -23,5 +23,6 @@ public class OrderDTO {
     private String address;
     private List<OrderDetailDTO> orderDetails;
     private Double totalPrice;
+    private DeliveryMethopDTO deliveryMethop;
 
 }
