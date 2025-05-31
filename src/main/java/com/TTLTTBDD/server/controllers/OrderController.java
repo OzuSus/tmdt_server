@@ -5,15 +5,19 @@ import com.TTLTTBDD.server.models.dto.OrderDetailDTO;
 import com.TTLTTBDD.server.models.dto.OrderDTO;
 //import com.TTLTTBDD.server.services.OderService;
 import com.TTLTTBDD.server.models.dto.StatusDTO;
+import com.TTLTTBDD.server.repositories.OrderDetailRepository;
+import com.TTLTTBDD.server.repositories.OrderRepository;
 import com.TTLTTBDD.server.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -22,6 +26,12 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    OrderDetailRepository orderDetailRepository;
+
+    @Autowired
+    OrderRepository orderRepository;
 
     @PostMapping("/place")
     public ResponseEntity<?> placeOrder(
@@ -172,6 +182,29 @@ public class OrderController {
     public ResponseEntity<Boolean> checkUserPurchased(@RequestParam Integer userId, @RequestParam Integer productId) {
         boolean hasPurchased = orderService.hasUserPurchasedProduct(userId, productId);
         return ResponseEntity.ok(hasPurchased);
+    }
+    @GetMapping("/monthly-revenue")
+    public ResponseEntity<?> getMonthlyRevenue(@RequestParam int year) {
+        List<Object[]> data = orderRepository.getRevenuePerMonth(year);
+        List<Map<String, Object>> response = data.stream().map(row -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("month", row[0]);
+            map.put("revenue", row[1]);
+            return map;
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/category-revenue")
+    public ResponseEntity<?> getCategoryRevenue() {
+        List<Object[]> data = orderDetailRepository.getRevenueByCategory();
+        List<Map<String, Object>> response = data.stream().map(row -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("category", row[0]);
+            map.put("count", row[1]);
+            return map;
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(response);
     }
 }
 

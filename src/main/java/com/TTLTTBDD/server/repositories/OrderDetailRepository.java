@@ -29,5 +29,10 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Intege
             @Param("statusId") Integer statusId
     );
 
+    @Query("SELECT c.name AS category, SUM(od.quantity) AS count " +
+            "FROM OrderDetail od JOIN od.idProduct p JOIN p.idCategory c JOIN od.idOder o " +
+            "WHERE o.idStatus.id = 8 " +
+            "GROUP BY c.name")
+    List<Object[]> getRevenueByCategory();
 
 }
