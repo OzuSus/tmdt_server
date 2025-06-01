@@ -357,6 +357,11 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
     public List<OrderDTO> getOrdersByStatus_Id(Integer statusId) {
+        boolean exists = statusRepository.existsById(statusId);
+        if (!exists) {
+            throw new IllegalArgumentException("ID status không hợp lệ.");
+        }
+
         List<Order> orders = oderRepository.findByIdStatus_Id(statusId);
         return orders.stream()
                 .map(this::convertToDTO)
