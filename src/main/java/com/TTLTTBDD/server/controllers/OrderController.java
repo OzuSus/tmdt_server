@@ -7,6 +7,7 @@ import com.TTLTTBDD.server.models.dto.OrderDTO;
 import com.TTLTTBDD.server.models.dto.StatusDTO;
 import com.TTLTTBDD.server.repositories.OrderDetailRepository;
 import com.TTLTTBDD.server.repositories.OrderRepository;
+import com.TTLTTBDD.server.services.OrderDetailService;
 import com.TTLTTBDD.server.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,7 @@ public class OrderController {
     private OrderService orderService;
 
     @Autowired
-    OrderDetailRepository orderDetailRepository;
+    private OrderDetailService orderDetailService;
 
     @PostMapping("/place")
     public ResponseEntity<?> placeOrder(
@@ -206,7 +207,7 @@ public class OrderController {
 
     @GetMapping("/category-revenue")
     public ResponseEntity<?> getCategoryRevenue() {
-        List<Object[]> data = orderDetailRepository.getRevenueByCategory();
+        List<Object[]> data = orderDetailService.getRevenueByCategory();
         List<Map<String, Object>> response = data.stream().map(row -> {
             Map<String, Object> map = new HashMap<>();
             map.put("category", row[0]);
