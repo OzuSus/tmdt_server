@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -29,9 +30,6 @@ public class OrderController {
 
     @Autowired
     OrderDetailRepository orderDetailRepository;
-
-    @Autowired
-    OrderRepository orderRepository;
 
     @PostMapping("/place")
     public ResponseEntity<?> placeOrder(
@@ -185,15 +183,26 @@ public class OrderController {
     }
     @GetMapping("/monthly-revenue")
     public ResponseEntity<?> getMonthlyRevenue(@RequestParam int year) {
-        List<Object[]> data = orderRepository.getRevenuePerMonth(year);
-        List<Map<String, Object>> response = data.stream().map(row -> {
+        List<Object[]> data = orderService.getRevenuePerMonth(year);
+
+        Map<Integer, Double> revenueMap = new HashMap<>();
+        for (Object[] row : data) {
+            Integer month = (Integer) row[0];
+            Double revenue = row[1] != null ? ((Number) row[1]).doubleValue() : 0.0;
+            revenueMap.put(month, revenue);
+        }
+
+        List<Map<String, Object>> response = new ArrayList<>();
+        for (int month = 1; month <= 12; month++) {
             Map<String, Object> map = new HashMap<>();
-            map.put("month", row[0]);
-            map.put("revenue", row[1]);
-            return map;
-        }).collect(Collectors.toList());
+            map.put("month", month);
+            map.put("revenue", revenueMap.getOrDefault(month, 0.0));
+            response.add(map);
+        }
+
         return ResponseEntity.ok(response);
     }
+
 
     @GetMapping("/category-revenue")
     public ResponseEntity<?> getCategoryRevenue() {

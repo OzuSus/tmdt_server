@@ -368,4 +368,8 @@ public class OrderService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+    public List<Object[]> getRevenuePerMonth(int year){
+        return oderRepository.getRevenuePerMonth(year);
+    }
 }
