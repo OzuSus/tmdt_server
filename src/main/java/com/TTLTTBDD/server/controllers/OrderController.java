@@ -221,6 +221,13 @@ public class OrderController {
         Double totalPrice = orderService.getTotalPriceByStatus(statusId);
         return ResponseEntity.ok(totalPrice != null ? totalPrice : 0.0);
     }
+    @GetMapping("/completed")
+    public ResponseEntity<List<OrderDTO>> getCompletedOrders() {
+
+        List<OrderDTO> completedOrders = orderService.getOrdersByStatus();
+        return ResponseEntity.ok(completedOrders);
+    }
+
 
 }
 

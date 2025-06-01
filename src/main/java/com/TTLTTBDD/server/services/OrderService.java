@@ -382,5 +382,10 @@ public class OrderService {
                 .mapToDouble(Order::getTotalPrice)
                 .sum();
     }
+    public List<OrderDTO> getOrdersByStatus() {
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
 
 }
