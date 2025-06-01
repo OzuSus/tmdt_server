@@ -216,5 +216,11 @@ public class OrderController {
         }).collect(Collectors.toList());
         return ResponseEntity.ok(response);
     }
+    @GetMapping("/total-price/status/{statusId}")
+    public ResponseEntity<Double> getTotalPriceByStatus(@PathVariable int statusId) {
+        Double totalPrice = orderService.getTotalPriceByStatus(statusId);
+        return ResponseEntity.ok(totalPrice != null ? totalPrice : 0.0);
+    }
+
 }
 

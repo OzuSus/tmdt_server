@@ -118,12 +118,15 @@ public class OrderService {
                 .id(order.getIdPaymentMethop().getId())
                 .type_payment(order.getIdPaymentMethop().getTypePayment())
                 .build();
-        DeliveryMethopDTO deliveryMethopDTO = DeliveryMethopDTO.builder()
-                .id(order.getIdDeliveryMethop().getId())
-                .name(order.getIdDeliveryMethop().getName())
-                .price(order.getIdDeliveryMethop().getPrice())
-                .description(order.getIdDeliveryMethop().getDescription())
-                .build();
+        DeliveryMethopDTO deliveryMethopDTO = null;
+        if (order.getIdDeliveryMethop() != null) {
+            deliveryMethopDTO = DeliveryMethopDTO.builder()
+                    .id(order.getIdDeliveryMethop().getId())
+                    .name(order.getIdDeliveryMethop().getName())
+                    .price(order.getIdDeliveryMethop().getPrice())
+                    .description(order.getIdDeliveryMethop().getDescription())
+                    .build();
+        }
         List<OrderDetailDTO> oderDetailDTOList = orderDetailRepository.findByIdOder_Id(order.getId()).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -372,4 +375,12 @@ public class OrderService {
     public List<Object[]> getRevenuePerMonth(int year){
         return orderRepository.getRevenuePerMonth(year);
     }
+    public Double getTotalPriceByStatus(int statusId) {
+        List<Order> orders = orderRepository.findByIdStatus_Id(statusId);
+        return orders.stream()
+                .filter(order -> order.getTotalPrice() != null)
+                .mapToDouble(Order::getTotalPrice)
+                .sum();
+    }
+
 }
