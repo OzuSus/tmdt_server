@@ -88,7 +88,7 @@ public class FavoriteServiceImpl implements FavoriteService {
                 .rating(product.getRating())
                 .reviewCount(product.getReview())
                 .categoryID(product.getIdCategory().getId())
-                .jewelerID(product.getIdJeweler().getId())
+//                .jewelerID(product.getIdJeweler().getId())
                 .build();
     }
 }
