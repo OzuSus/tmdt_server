@@ -20,4 +20,7 @@ public class DeliveryMethop {
     @Column(name = "price")
     private Double price;
 
+    @Column(name = "description")
+    private String description;
+
 }
