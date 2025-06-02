@@ -16,7 +16,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
     List<User> findByRole_Id(Integer roleId);
-    @Query("SELECT MONTH(u.createdAt) as month, COUNT(u) as count FROM User u WHERE u.role.id = 0 GROUP BY MONTH(u.createdAt)")
+    @Query("SELECT MONTH(u.createdAt) as month, COUNT(u) as count FROM User u WHERE u.role.id = 0 GROUP BY MONTH(u.createdAt) ORDER BY MONTH(u.createdAt)")
     List<Object[]> countUsersByRoleAndMonth();
 
 }

@@ -228,10 +228,22 @@ public class UserService {
 
     public Map<Integer, Long> getRegularUsersByMonth() {
         List<Object[]> results = userRepository.countUsersByRoleAndMonth();
-        return results.stream()
-                .collect(Collectors.toMap(
-                        result -> (Integer) result[0],
-                        result -> (Long) result[1]
-                ));
+        Map<Integer, Long> monthlyStats = new TreeMap<>();
+
+        // Initialize all months with 0 count
+        for (int month = 1; month <= 12; month++) {
+            monthlyStats.put(month, 0L);
+        }
+
+        // Update with actual data
+        for (Object[] result : results) {
+            Integer month = (Integer) result[0];
+            Long count = (Long) result[1];
+            if (month != null && count != null) {
+                monthlyStats.put(month, count);
+            }
+        }
+
+        return monthlyStats;
     }
 }
