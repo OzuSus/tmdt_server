@@ -25,4 +25,5 @@ public class OrderDTO {
     private List<OrderDetailDTO> orderDetails;
     private Double totalPrice;
     private DeliveryMethopDTO deliveryMethop;
+
 }

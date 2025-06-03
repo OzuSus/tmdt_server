@@ -19,7 +19,7 @@ public class Product {
     @Column(name = "review")
     private Integer review;
 
-    @Column(name = "name", nullable = false, length = 50)
+    @Column(name = "name", nullable = false, length = 255)
     private String name;
 
     @Column(name = "prize", nullable = false)

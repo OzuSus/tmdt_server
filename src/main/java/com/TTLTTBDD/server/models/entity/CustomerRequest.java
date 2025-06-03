@@ -17,11 +17,17 @@ public class CustomerRequest {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId", referencedColumnName = "id_user")
+    @JoinColumn(name = "userId")
     private User user;
 
     @Column(name = "title")
     private String title;
+
+    @Column(name = "min_price")
+    private Double minPrice;
+
+    @Column(name = "max_price")
+    private Double maxPrice;
 
     @Lob
     @Column(name = "description")

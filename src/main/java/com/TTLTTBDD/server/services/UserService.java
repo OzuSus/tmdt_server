@@ -43,9 +43,11 @@ public class UserService {
 
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
+                .filter(user -> user.getRole().getId() == 0)
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
 
     public Optional<UserDTO> getUserById(int id) {
         return userRepository.findUsersById(id).map(this::convertToDTO);

@@ -5,6 +5,9 @@ import com.TTLTTBDD.server.models.dto.OrderDetailDTO;
 import com.TTLTTBDD.server.models.dto.OrderDTO;
 //import com.TTLTTBDD.server.services.OderService;
 import com.TTLTTBDD.server.models.dto.StatusDTO;
+import com.TTLTTBDD.server.repositories.OrderDetailRepository;
+import com.TTLTTBDD.server.repositories.OrderRepository;
+import com.TTLTTBDD.server.services.OrderDetailService;
 import com.TTLTTBDD.server.models.entity.Order;
 import com.TTLTTBDD.server.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +15,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -23,6 +29,9 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private OrderDetailService orderDetailService;
 
     @PostMapping("/place")
     public ResponseEntity<?> placeOrder(
@@ -177,7 +186,51 @@ public class OrderController {
         boolean hasPurchased = orderService.hasUserPurchasedProduct(userId, productId);
         return ResponseEntity.ok(hasPurchased);
     }
+    @GetMapping("/monthly-revenue")
+    public ResponseEntity<?> getMonthlyRevenue(@RequestParam int year) {
+        List<Object[]> data = orderService.getRevenuePerMonth(year);
 
+        Map<Integer, Double> revenueMap = new HashMap<>();
+        for (Object[] row : data) {
+            Integer month = (Integer) row[0];
+            Double revenue = row[1] != null ? ((Number) row[1]).doubleValue() : 0.0;
+            revenueMap.put(month, revenue);
+        }
+
+        List<Map<String, Object>> response = new ArrayList<>();
+        for (int month = 1; month <= 12; month++) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("month", month);
+            map.put("revenue", revenueMap.getOrDefault(month, 0.0));
+            response.add(map);
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping("/category-revenue")
+    public ResponseEntity<?> getCategoryRevenue() {
+        List<Object[]> data = orderDetailService.getRevenueByCategory();
+        List<Map<String, Object>> response = data.stream().map(row -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("category", row[0]);
+            map.put("count", row[1]);
+            return map;
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/total-price/status/{statusId}")
+    public ResponseEntity<Double> getTotalPriceByStatus(@PathVariable int statusId) {
+        Double totalPrice = orderService.getTotalPriceByStatus(statusId);
+        return ResponseEntity.ok(totalPrice != null ? totalPrice : 0.0);
+    }
+    @GetMapping("/completed")
+    public ResponseEntity<List<OrderDTO>> getCompletedOrders() {
+
+        List<OrderDTO> completedOrders = orderService.getOrdersByStatus();
+        return ResponseEntity.ok(completedOrders);
+    }
     @GetMapping("/all")
     public ResponseEntity<List<OrderDTO>>getAllOrders() {
         List<OrderDTO> orders = orderService.getAllOrders();
@@ -197,5 +250,7 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống.");
         }
     }
+
+
 }
 
