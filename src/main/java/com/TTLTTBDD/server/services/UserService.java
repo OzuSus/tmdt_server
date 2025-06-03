@@ -93,6 +93,28 @@ public class UserService {
         return convertToDTO(savedUser);
     }
 
+    public boolean forgotPassword(String username, String email) {
+        Optional<User> optionalUser = userRepository.findByUsernameAndEmail(username, email);
+        if (optionalUser.isEmpty()) return false;
+
+        User user = optionalUser.get();
+
+        user.setPassword(passwordEncoder.encode("123" + username + email)); //default new password
+
+        User savedUser = userRepository.save(user);
+
+        String token = UUID.randomUUID().toString();
+        Verifytoken verificationToken = new Verifytoken();
+        verificationToken.setToken(token);
+        verificationToken.setUser(savedUser);
+        verificationToken.setExpiryDate(LocalDateTime.now().plusHours(24));
+        tokenRepository.save(verificationToken);
+
+        emailService.sendForgotPasswordEmail(savedUser);
+
+        return true;
+    }
+
     public UserDTO updateUserInfoAccount(UserDTO userDTO) {
         User user = userRepository.findById(userDTO.getId()).orElseThrow(() -> new RuntimeException("Ko tìm thấy user"));
         user.setUsername(userDTO.getUsername());
