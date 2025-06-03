@@ -118,6 +118,13 @@ public class OrderService {
                 .id(oder.getIdPaymentMethop().getId())
                 .type_payment(oder.getIdPaymentMethop().getTypePayment())
                 .build();
+        DeliveryMethopDTO deliveryMethopDTO = null;
+        if (oder.getIdDeliveryMethop() != null) {
+             deliveryMethopDTO = DeliveryMethopDTO.builder()
+                    .id(oder.getIdDeliveryMethop().getId())
+                    .name(oder.getIdDeliveryMethop().getName())
+                    .build();
+        }
         List<OrderDetailDTO> oderDetailDTOList = oderDetailRepository.findByIdOder_Id(oder.getId()).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -135,6 +142,7 @@ public class OrderService {
                 .address(oder.getAddress())
                 .orderDetails(oderDetailDTOList)
                 .totalPrice(oder.getTotalPrice())
+                .deliveryMethop(deliveryMethopDTO)
                 .build();
     }
 
@@ -341,6 +349,23 @@ public class OrderService {
     public boolean hasUserPurchasedProduct(Integer userId, Integer productId) {
         // status là 8: Đã giao hàng
         return oderDetailRepository.hasUserPurchasedProduct(userId, productId, 8);
+    }
+    public List<OrderDTO> getAllOrders() {
+        List<Order> orders = oderRepository.findAll();
+        return orders.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+    public List<OrderDTO> getOrdersByStatus_Id(Integer statusId) {
+        boolean exists = statusRepository.existsById(statusId);
+        if (!exists) {
+            throw new IllegalArgumentException("ID status không hợp lệ.");
+        }
+
+        List<Order> orders = oderRepository.findByIdStatus_Id(statusId);
+        return orders.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
     public List<StatusDTO> getAllStatuses() {
         List<Status> statuses = statusRepository.findAll();

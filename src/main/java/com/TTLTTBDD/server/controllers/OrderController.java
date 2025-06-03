@@ -5,6 +5,7 @@ import com.TTLTTBDD.server.models.dto.OrderDetailDTO;
 import com.TTLTTBDD.server.models.dto.OrderDTO;
 //import com.TTLTTBDD.server.services.OderService;
 import com.TTLTTBDD.server.models.dto.StatusDTO;
+import com.TTLTTBDD.server.models.entity.Order;
 import com.TTLTTBDD.server.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -156,11 +157,13 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
     }
+
     @GetMapping("/statuses")
     public ResponseEntity<List<StatusDTO>> getAllStatuses() {
         List<StatusDTO> statuses = orderService.getAllStatuses();
         return ResponseEntity.ok(statuses);
     }
+
     @GetMapping("/filter-by-status/{statusId}/{userId}")
     public ResponseEntity<List<OrderDTO>> getOrdersByStatusAndUser(
             @PathVariable Integer statusId,
@@ -168,10 +171,31 @@ public class OrderController {
         List<OrderDTO> orders = orderService.getOrdersByStatusAndUser(statusId, userId);
         return ResponseEntity.ok(orders);
     }
+
     @GetMapping("/check-purchased")
     public ResponseEntity<Boolean> checkUserPurchased(@RequestParam Integer userId, @RequestParam Integer productId) {
         boolean hasPurchased = orderService.hasUserPurchasedProduct(userId, productId);
         return ResponseEntity.ok(hasPurchased);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<OrderDTO>>getAllOrders() {
+        List<OrderDTO> orders = orderService.getAllOrders();
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/fill-by-statusId")
+    public ResponseEntity<?> getOrdersByStatus(@RequestParam Integer status_id) {
+        try {
+            List<OrderDTO> orders = orderService.getOrdersByStatus_Id(status_id);
+            return ResponseEntity.ok(orders);
+        } catch (IllegalArgumentException ex) {
+            // Trả về lỗi 400 nếu status_id không hợp lệ
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        } catch (Exception ex) {
+            // Trả về lỗi 500 nếu có lỗi hệ thống
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống.");
+        }
     }
 }
 
