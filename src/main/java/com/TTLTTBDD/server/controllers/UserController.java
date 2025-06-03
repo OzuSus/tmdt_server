@@ -206,8 +206,8 @@ public class UserController {
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestParam String username, @RequestParam String email) {
         try {
-            if(userService.forgotPassword(username, email)) {
-                return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("Sai tên đăng nhập hoặc email.");
+            if(!userService.forgotPassword(username, email)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Sai tên đăng nhập hoặc email.");
             }
             return ResponseEntity.ok("Mật khẩu mới đã được gửi đến email của bạn.");
         } catch (Exception e) {
