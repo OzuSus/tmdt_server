@@ -44,7 +44,7 @@ public class EmailService {
         }
     }
 
-    public void sendForgotPasswordEmail(User user) {
+    public void sendForgotPasswordEmail(User user, String newPassword) {
         String subject = "Xác nhận thay đổi mật khẩu người dùng";
 
         String content = "<div style=\"font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; max-width: 600px; margin: auto; background: #ffffff;\">\n" +
@@ -53,7 +53,7 @@ public class EmailService {
                 "    <h2 style=\"color: #333;\">Xác nhận thay đổi mật khẩu</h2>\n" +
                 "    <p style=\"color: #555;\">Xin chào <strong>" + user.getFullname() + "</strong>,</p>\n" +
                 "    <p style=\"color: #555;\">Bạn đã yêu cầu thay đổi mật khẩu. Dưới đây là mật khẩu mới của bạn</p>\n" +
-                "    <p style=\"color: #555; font-weight: bold;\">" + "123" + user.getUsername() + user.getEmail() + "</p>\n" +
+                "    <p style=\"color: #555; font-weight: bold;\">" + newPassword + "</p>\n" +
                 "    <p style=\"color: #aaa; margin-top: 30px; font-size: 12px;\">Liên hệ chúng tôi nếu có vần đề cần hỗ trợ.</p>\n" +
                 "  </div>\n" +
                 "</div>";

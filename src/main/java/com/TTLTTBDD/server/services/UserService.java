@@ -102,11 +102,13 @@ public class UserService {
 
         User user = optionalUser.get();
 
-        user.setPassword(passwordEncoder.encode(passwordGenerator.generatePassword(16))); // Tạo mật khẩu mới ngẫu nhiên
+        String newPassword = passwordGenerator.generatePassword(16);
+
+        user.setPassword(passwordEncoder.encode(newPassword)); // Tạo mật khẩu mới ngẫu nhiên
 
         User savedUser = userRepository.save(user);
 
-        emailService.sendForgotPasswordEmail(savedUser);
+        emailService.sendForgotPasswordEmail(savedUser, newPassword);
 
         return true;
     }
