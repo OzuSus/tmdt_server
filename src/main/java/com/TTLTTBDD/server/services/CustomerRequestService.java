@@ -26,6 +26,10 @@ public class CustomerRequestService {
     }
 
     public CustomerRequestDTO createRequest(CustomerRequestDTO dto) {
+        if (dto.getMinPrice() != null && dto.getMaxPrice() != null && dto.getMinPrice() >= dto.getMaxPrice()) {
+            throw new IllegalArgumentException("Giá max phải > giá min");
+        }
+
         CustomerRequest request = new CustomerRequest();
         request.setTitle(dto.getTitle());
         request.setDescription(dto.getDescription());
@@ -34,12 +38,13 @@ public class CustomerRequestService {
         request.setCreatedAt(dto.getCreatedAt() != null ? dto.getCreatedAt() : LocalDate.now());
 
         User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + dto.getUserId()));
+                .orElseThrow(() -> new RuntimeException("User ko tồn tại"));
         request.setUser(user);
 
         CustomerRequest saved = customerRequestRepository.save(request);
         return convertToDTO(saved);
     }
+
 
     private CustomerRequestDTO convertToDTO(CustomerRequest request) {
         CustomerRequestDTO dto = new CustomerRequestDTO();

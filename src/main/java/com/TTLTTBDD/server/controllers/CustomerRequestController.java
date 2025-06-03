@@ -4,8 +4,10 @@ package com.TTLTTBDD.server.controllers;
 import com.TTLTTBDD.server.models.dto.CustomerRequestDTO;
 import com.TTLTTBDD.server.services.CustomerRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -21,8 +23,14 @@ public class CustomerRequestController {
         return ResponseEntity.ok(customerRequestService.getAllRequests());
     }
 
-    @PostMapping
-    public ResponseEntity<CustomerRequestDTO> createRequest(@RequestBody CustomerRequestDTO dto) {
-        return ResponseEntity.ok(customerRequestService.createRequest(dto));
+    @PostMapping("/create")
+    public ResponseEntity<?> createRequest(@RequestBody CustomerRequestDTO dto) {
+        try {
+            return ResponseEntity.ok(customerRequestService.createRequest(dto));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
+
 }
+
