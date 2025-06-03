@@ -19,4 +19,5 @@ public class CustomerRequestDTO {
     private Double maxPrice;
     private String description;
     private LocalDate createdAt;
+
 }
