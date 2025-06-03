@@ -192,6 +192,14 @@ public class UserController {
 
         return new RedirectView("/verify_success.html?username=" + user.getUsername());
     }
+    @GetMapping("/regular")
+    public List<UserDTO> getAllRegularUsers() {
+        return userService.getAllRegularUsers();
+    }
 
+    @GetMapping("/regular/monthly-stats")
+    public Map<String, Long> getRegularUsersByMonth() {
+        return userService.getRegularUsersByMonth();
+    }
 
 }
