@@ -22,6 +22,10 @@ public class CustomerRequestController {
     public ResponseEntity<List<CustomerRequestDTO>> getAllRequests() {
         return ResponseEntity.ok(customerRequestService.getAllRequests());
     }
+    @GetMapping("user")
+    public ResponseEntity<List<CustomerRequestDTO>> getRequestByUserId(@RequestParam int userId){
+        return ResponseEntity.ok(customerRequestService.getRequestByUserId(userId));
+    }
 
     @PostMapping("/create")
     public ResponseEntity<?> createRequest(@RequestBody CustomerRequestDTO dto) {
