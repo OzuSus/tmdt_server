@@ -198,7 +198,7 @@ public class UserController {
     }
 
     @GetMapping("/regular/monthly-stats")
-    public Map<Integer, Long> getRegularUsersByMonth() {
+    public Map<String, Long> getRegularUsersByMonth() {
         return userService.getRegularUsersByMonth();
     }
 

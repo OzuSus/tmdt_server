@@ -226,21 +226,14 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public Map<Integer, Long> getRegularUsersByMonth() {
+    public Map<String, Long> getRegularUsersByMonth() {
         List<Object[]> results = userRepository.countUsersByRoleAndMonth();
-        Map<Integer, Long> monthlyStats = new TreeMap<>();
+        Map<String, Long> monthlyStats = new LinkedHashMap<>();
 
-        // Initialize all months with 0 count
-        for (int month = 1; month <= 12; month++) {
-            monthlyStats.put(month, 0L);
-        }
-
-        // Update with actual data
         for (Object[] result : results) {
-            Integer month = (Integer) result[0];
-            Long count = (Long) result[1];
-            if (month != null && count != null) {
-                monthlyStats.put(month, count);
+            if (result[0] != null && result[1] != null && result[2] != null) {
+                String yearMonth = result[0] + "-" + String.format("%02d", result[1]);
+                monthlyStats.put(yearMonth, (Long) result[2]);
             }
         }
 
