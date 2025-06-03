@@ -29,6 +29,11 @@ public class CustomerRequestService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+    public List<CustomerRequestDTO> getRequestById(int Id) {
+        return customerRequestRepository.findById(Id).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
 
     public CustomerRequestDTO createRequest(CustomerRequestDTO dto) {
         if (dto.getMinPrice() != null && dto.getMaxPrice() != null && dto.getMinPrice() >= dto.getMaxPrice()) {
