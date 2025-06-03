@@ -221,13 +221,13 @@ public class UserService {
         return true;
     }
     public List<UserDTO> getAllRegularUsers() {
-        return userRepository.findByRole_Id(0).stream()
+        return userRepository.findByRole_IdAndStatus(0,1).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     public Map<String, Long> getRegularUsersByMonth() {
-        List<Object[]> results = userRepository.countUsersByRoleAndMonth();
+        List<Object[]> results = userRepository.countUsersByRoleAndMonthAndStatus();
         Map<String, Long> monthlyStats = new LinkedHashMap<>();
 
         for (Object[] result : results) {
