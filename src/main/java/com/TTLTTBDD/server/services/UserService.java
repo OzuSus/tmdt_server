@@ -9,6 +9,7 @@ import com.TTLTTBDD.server.models.entity.Role;
 import com.TTLTTBDD.server.models.entity.User;
 import com.TTLTTBDD.server.models.entity.Verifytoken;
 import com.TTLTTBDD.server.repositories.*;
+import com.TTLTTBDD.server.utils.PasswordGenerator;
 import com.TTLTTBDD.server.utils.loadFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -36,6 +37,8 @@ public class UserService {
 
     private loadFile loadFile = new loadFile();
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private PasswordGenerator passwordGenerator = new PasswordGenerator();
+
     @Autowired
     private FavoriteRepository favoriteRepository;
     @Autowired
@@ -99,16 +102,9 @@ public class UserService {
 
         User user = optionalUser.get();
 
-        user.setPassword(passwordEncoder.encode("123" + username + email)); //default new password
+        user.setPassword(passwordEncoder.encode(passwordGenerator.generatePassword(16))); // Tạo mật khẩu mới ngẫu nhiên
 
         User savedUser = userRepository.save(user);
-
-        String token = UUID.randomUUID().toString();
-        Verifytoken verificationToken = new Verifytoken();
-        verificationToken.setToken(token);
-        verificationToken.setUser(savedUser);
-        verificationToken.setExpiryDate(LocalDateTime.now().plusHours(24));
-        tokenRepository.save(verificationToken);
 
         emailService.sendForgotPasswordEmail(savedUser);
 
