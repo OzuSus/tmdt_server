@@ -192,6 +192,7 @@ public class UserController {
 
         return new RedirectView("/verify_success.html?username=" + user.getUsername());
     }
+
     @GetMapping("/regular")
     public List<UserDTO> getAllRegularUsers() {
         return userService.getAllRegularUsers();
@@ -200,6 +201,16 @@ public class UserController {
     @GetMapping("/regular/monthly-stats")
     public Map<String, Long> getRegularUsersByMonth() {
         return userService.getRegularUsersByMonth();
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestParam String username, @RequestParam String email) {
+        try {
+            userService.forgotPassword(username, email);
+            return ResponseEntity.ok("Mật khẩu mới đã được gửi đến email của bạn.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống.");
+        }
     }
 
 }
