@@ -352,6 +352,23 @@ public class OrderService {
         // status là 8: Đã giao hàng
         return orderDetailRepository.hasUserPurchasedProduct(userId, productId, 8);
     }
+    public List<OrderDTO> getAllOrders() {
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+    public List<OrderDTO> getOrdersByStatus_Id(Integer statusId) {
+        boolean exists = statusRepository.existsById(statusId);
+        if (!exists) {
+            throw new IllegalArgumentException("ID status không hợp lệ.");
+        }
+
+        List<Order> orders = orderRepository.findByIdStatus_Id(statusId);
+        return orders.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
     public List<StatusDTO> getAllStatuses() {
         List<Status> statuses = statusRepository.findAll();
         return statuses.stream()

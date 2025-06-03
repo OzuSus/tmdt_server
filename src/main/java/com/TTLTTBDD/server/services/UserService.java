@@ -18,10 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -225,5 +222,23 @@ public class UserService {
         userRepository.save(user);
         return true;
     }
+    public List<UserDTO> getAllRegularUsers() {
+        return userRepository.findByRole_IdAndStatus(0,true).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
 
+    public Map<String, Long> getRegularUsersByMonth() {
+        List<Object[]> results = userRepository.countUsersByRoleAndMonthAndStatus(0,true);
+        Map<String, Long> monthlyStats = new LinkedHashMap<>();
+
+        for (Object[] result : results) {
+            if (result[0] != null && result[1] != null && result[2] != null) {
+                String yearMonth = result[0] + "-" + String.format("%02d", result[1]);
+                monthlyStats.put(yearMonth, (Long) result[2]);
+            }
+        }
+
+        return monthlyStats;
+    }
 }
