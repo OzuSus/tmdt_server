@@ -348,16 +348,19 @@ public class OrderService {
             orderDetailRepository.save(orderDetail);
         }
     }
+
     public boolean hasUserPurchasedProduct(Integer userId, Integer productId) {
         // status là 8: Đã giao hàng
         return orderDetailRepository.hasUserPurchasedProduct(userId, productId, 8);
     }
+
     public List<OrderDTO> getAllOrders() {
         List<Order> orders = orderRepository.findAll();
         return orders.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
     public List<OrderDTO> getOrdersByStatus_Id(Integer statusId) {
         boolean exists = statusRepository.existsById(statusId);
         if (!exists) {
@@ -369,6 +372,7 @@ public class OrderService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
     public List<StatusDTO> getAllStatuses() {
         List<Status> statuses = statusRepository.findAll();
         return statuses.stream()
@@ -389,9 +393,10 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    public List<Object[]> getRevenuePerMonth(int year){
+    public List<Object[]> getRevenuePerMonth(int year) {
         return orderRepository.getRevenuePerMonth(year);
     }
+
     public Double getTotalPriceByStatus(int statusId) {
         List<Order> orders = orderRepository.findByIdStatus_Id(statusId);
         return orders.stream()
@@ -399,10 +404,27 @@ public class OrderService {
                 .mapToDouble(Order::getTotalPrice)
                 .sum();
     }
+
     public List<OrderDTO> getOrdersByStatus() {
         List<Order> orders = orderRepository.findAll();
         return orders.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
+    public void cancelOrder(Integer orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+
+        // Chỉ cho hủy nếu status là chưa xác nhận (id là 5)
+        if (order.getIdStatus().getId() != 5) {
+            throw new IllegalStateException("Chỉ có thể hủy đơn hàng chưa xác nhận");
+        }
+
+        // Tìm và xóa các chi tiết đơn
+        List<OrderDetail> details = orderDetailRepository.findByIdOder_Id(orderId);
+        orderDetailRepository.deleteAll(details);
+
+        // Sau đó xóa đơn
+        orderRepository.delete(order);
+    }
 
 }

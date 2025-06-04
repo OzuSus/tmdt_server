@@ -251,6 +251,17 @@ public class OrderController {
         }
     }
 
+    @DeleteMapping("/cancel/{id}")
+    public ResponseEntity<String> cancelOrder(@PathVariable Integer id) {
+        try {
+            orderService.cancelOrder(id);
+            return ResponseEntity.ok("Đã hủy đơn hàng thành công");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 
 }
 
