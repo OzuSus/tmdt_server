@@ -40,4 +40,8 @@ public class JewelerRespons {
     @Column(name = "created_at", nullable = false)
     private LocalDate createdAt;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "categoryId", nullable = false)
+    private Category category;
+
 }

@@ -11,13 +11,14 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerRequestDTO {
+public class JewelerResponseDTO {
     private Integer id;
-    private Integer userId;
-    private String title;
-    private Double minPrice;
-    private Double maxPrice;
+    private CustomerRequestDTO customerRequestId;
+    private UserDTO jeweler;
+    private String name;
+    private Double proposedPrice;
     private String description;
+    private String image;
     private LocalDate createdAt;
     private CategoryDTO categoryId;
 
