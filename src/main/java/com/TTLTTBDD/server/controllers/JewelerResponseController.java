@@ -1,8 +1,8 @@
 package com.TTLTTBDD.server.controllers;
 
-import com.TTLTTBDD.server.models.dto.JewelerResponseDTO;
+import com.TTLTTBDD.server.models.dto.JewelerResponseDTORequest;
+import com.TTLTTBDD.server.models.dto.JewelerResponseDTOResponse;
 import com.TTLTTBDD.server.services.JewelerResponseService;
-import com.TTLTTBDD.server.utils.loadFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +19,12 @@ public class JewelerResponseController {
     private JewelerResponseService jewelerResponseService;
 
     @GetMapping
-    public ResponseEntity<List<JewelerResponseDTO>> getAllResponses() {
+    public ResponseEntity<List<JewelerResponseDTOResponse>> getAllResponses() {
         return ResponseEntity.ok(jewelerResponseService.getAllResponses());
     }
 
     @GetMapping("/request/{requestId}")
-    public ResponseEntity<List<JewelerResponseDTO>> getResponsesByRequestId(@PathVariable Integer requestId) {
+    public ResponseEntity<List<JewelerResponseDTOResponse>> getResponsesByRequestId(@PathVariable Integer requestId) {
         return ResponseEntity.ok(jewelerResponseService.getResponsesByRequestId(requestId));
     }
 
@@ -38,13 +38,13 @@ public class JewelerResponseController {
             @RequestParam("categoryId") Integer categoryId,
             @RequestParam("image") MultipartFile image) {
         try {
-            JewelerResponseDTO dto = jewelerResponseService.createResponse(customerRequestId, jewelerId, name, proposedPrice, description, categoryId, image);
+            JewelerResponseDTOResponse dto = jewelerResponseService.createResponse(customerRequestId, jewelerId, name, proposedPrice, description, categoryId, image);
             return ResponseEntity.status(HttpStatus.CREATED).body(dto);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi khi xử lý yêu cầu.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Đã xảy ra lỗi khi xử lý yêu cầu.");
         }
     }
 

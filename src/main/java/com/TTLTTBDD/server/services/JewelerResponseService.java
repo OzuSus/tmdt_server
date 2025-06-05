@@ -1,9 +1,6 @@
 package com.TTLTTBDD.server.services;
 
-import com.TTLTTBDD.server.models.dto.CategoryDTO;
-import com.TTLTTBDD.server.models.dto.CustomerRequestDTO;
-import com.TTLTTBDD.server.models.dto.JewelerResponseDTO;
-import com.TTLTTBDD.server.models.dto.UserDTO;
+import com.TTLTTBDD.server.models.dto.*;
 import com.TTLTTBDD.server.models.entity.Category;
 import com.TTLTTBDD.server.models.entity.CustomerRequest;
 import com.TTLTTBDD.server.models.entity.JewelerRespons;
@@ -36,15 +33,15 @@ public class JewelerResponseService {
     private CategotyRepository categotyRepository;
 
 
-    public List<JewelerResponseDTO> getAllResponses() {
+    public List<JewelerResponseDTOResponse> getAllResponses() {
         return jewelerResponsRepository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    public List<JewelerResponseDTO> getResponsesByRequestId(Integer requestId) {
+    public List<JewelerResponseDTOResponse> getResponsesByRequestId(Integer requestId) {
         return jewelerResponsRepository.findAllByRequest_Id(requestId).stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    public JewelerResponseDTO createResponse(Integer customerRequestId, Integer jewelerId, String name, Double proposedPrice, String description, Integer categoryId, MultipartFile image) throws IOException {
+    public JewelerResponseDTOResponse createResponse(Integer customerRequestId, Integer jewelerId, String name, Double proposedPrice, String description, Integer categoryId, MultipartFile image) throws IOException {
 
         CustomerRequest request = customerRequestRepository.findById(customerRequestId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy yêu cầu khách hàng"));
@@ -72,17 +69,77 @@ public class JewelerResponseService {
         return toDTO(jewelerResponsRepository.save(entity));
     }
 
-    private JewelerResponseDTO toDTO(JewelerRespons jewelerRespons) {
-        return JewelerResponseDTO.builder()
-                .id(jewelerRespons.getId())
-                .customerRequestId(jewelerRespons.getRequest().getId())
-                .jewelerId(jewelerRespons.getJeweler().getId())
-                .name(jewelerRespons.getName())
-                .proposedPrice(jewelerRespons.getProposedPrice())
-                .description(jewelerRespons.getDescription())
-                .image(jewelerRespons.getImage())
-                .createdAt(jewelerRespons.getCreatedAt())
-                .categoryId(jewelerRespons.getCategory().getId())
-                .build();
+    private JewelerResponseDTOResponse toDTO(JewelerRespons jewelerRespons) {
+        JewelerResponseDTOResponse dtoResponse = new JewelerResponseDTOResponse();
+
+        UserDTO userDTO = null;
+        if(jewelerRespons.getRequest().getUser() != null){
+            userDTO = UserDTO.builder()
+                    .id(jewelerRespons.getRequest().getUser().getId())
+                    .username(jewelerRespons.getRequest().getUser().getUsername())
+                    .fullname(jewelerRespons.getRequest().getUser().getFullname())
+                    .address(jewelerRespons.getRequest().getUser().getAddress())
+                    .phone(jewelerRespons.getRequest().getUser().getPhone())
+                    .email(jewelerRespons.getRequest().getUser().getEmail())
+                    .roleId(jewelerRespons.getRequest().getUser().getId())
+                    .avatar(jewelerRespons.getRequest().getUser().getAvatar())
+                    .status(jewelerRespons.getRequest().getUser().getStatus())
+                    .build();
+        }
+        CategoryDTO categoryDTO = null;
+        if (jewelerRespons.getRequest().getIdcategory() != null) {
+            categoryDTO = CategoryDTO.builder()
+                    .id(jewelerRespons.getRequest().getIdcategory().getId())
+                    .name(jewelerRespons.getRequest().getIdcategory().getName())
+                    .image(jewelerRespons.getRequest().getIdcategory().getImage())
+                    .build();
+        }
+        CustomerRequestDTOResponse customerRequest = null;
+        if(jewelerRespons.getRequest() != null){
+            customerRequest = CustomerRequestDTOResponse.builder()
+                    .id(jewelerRespons.getRequest().getId())
+                    .user(userDTO)
+                    .title(jewelerRespons.getRequest().getTitle())
+                    .minPrice(jewelerRespons.getRequest().getMinPrice())
+                    .maxPrice(jewelerRespons.getRequest().getMaxPrice())
+                    .description(jewelerRespons.getDescription())
+                    .createdAt(jewelerRespons.getRequest().getCreatedAt())
+                    .category(categoryDTO)
+                    .build();
+        }
+
+        UserDTO jeweler = null;
+        if(jewelerRespons.getJeweler() != null){
+            jeweler = UserDTO.builder()
+                    .id(jewelerRespons.getJeweler().getId())
+                    .username(jewelerRespons.getJeweler().getUsername())
+                    .fullname(jewelerRespons.getJeweler().getFullname())
+                    .address(jewelerRespons.getJeweler().getAddress())
+                    .phone(jewelerRespons.getJeweler().getPhone())
+                    .email(jewelerRespons.getJeweler().getEmail())
+                    .roleId(jewelerRespons.getJeweler().getId())
+                    .avatar(jewelerRespons.getJeweler().getAvatar())
+                    .status(jewelerRespons.getJeweler().getStatus())
+                    .build();
+        }
+        CategoryDTO category = null;
+        if (jewelerRespons.getCategory() != null) {
+            category = CategoryDTO.builder()
+                    .id(jewelerRespons.getCategory().getId())
+                    .name(jewelerRespons.getCategory().getName())
+                    .image(jewelerRespons.getCategory().getImage())
+                    .build();
+        }
+        dtoResponse.setId(jewelerRespons.getId());
+        dtoResponse.setCustomerRequest(customerRequest);
+        dtoResponse.setJeweler(jeweler);
+        dtoResponse.setName(jewelerRespons.getName());
+        dtoResponse.setName(jewelerRespons.getName());
+        dtoResponse.setProposedPrice(jewelerRespons.getProposedPrice());
+        dtoResponse.setDescription(jewelerRespons.getDescription());
+        dtoResponse.setImage(jewelerRespons.getImage());
+        dtoResponse.setCreatedAt(jewelerRespons.getCreatedAt());
+        dtoResponse.setCategory(category);
+        return dtoResponse;
     }
 }
