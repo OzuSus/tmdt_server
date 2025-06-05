@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerRequestDTO {
+public class CustomerRequestDTORequest {
     private Integer id;
     private Integer userId;
     private String title;

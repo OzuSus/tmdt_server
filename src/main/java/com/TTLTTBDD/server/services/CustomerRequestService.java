@@ -1,8 +1,9 @@
 package com.TTLTTBDD.server.services;
 
 import com.TTLTTBDD.server.models.dto.CategoryDTO;
-import com.TTLTTBDD.server.models.dto.CustomerRequestDTO;
-import com.TTLTTBDD.server.models.dto.DeliveryMethopDTO;
+import com.TTLTTBDD.server.models.dto.CustomerRequestDTORequest;
+import com.TTLTTBDD.server.models.dto.CustomerRequestDTOResponse;
+import com.TTLTTBDD.server.models.dto.UserDTO;
 import com.TTLTTBDD.server.models.entity.Category;
 import com.TTLTTBDD.server.models.entity.CustomerRequest;
 import com.TTLTTBDD.server.models.entity.User;
@@ -25,38 +26,38 @@ public class CustomerRequestService {
     @Autowired
     CategotyRepository categotyRepository;
 
-    public List<CustomerRequestDTO> getAllRequests() {
+    public List<CustomerRequestDTOResponse> getAllRequests() {
         return customerRequestRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-    public List<CustomerRequestDTO> getRequestByUserId(int userId) {
+    public List<CustomerRequestDTOResponse> getRequestByUserId(int userId) {
         return customerRequestRepository.findByUser_Id(userId).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-    public List<CustomerRequestDTO> getRequestById(int Id) {
+    public List<CustomerRequestDTOResponse> getRequestById(int Id) {
         return customerRequestRepository.findById(Id).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-    public CustomerRequestDTO createRequest(CustomerRequestDTO dto) {
-        if (dto.getMinPrice() != null && dto.getMaxPrice() != null && dto.getMinPrice() > dto.getMaxPrice()) {
+    public CustomerRequestDTOResponse createRequest(CustomerRequestDTORequest dtoRequest) {
+        User user = userRepository.findById(dtoRequest.getUserId())
+                .filter(u -> u.getRole().getId() == 0)
+                .orElseThrow(() -> new RuntimeException("Lỗi: User ko tồn tại or user là jeweler/admin"));
+        if (dtoRequest.getMinPrice() != null && dtoRequest.getMaxPrice() != null && dtoRequest.getMinPrice() > dtoRequest.getMaxPrice()) {
             throw new IllegalArgumentException("Giá max phải >= giá min");
         }
-        Category category = categotyRepository.findCategoryById(dto.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("Category khong hop le"));
+        Category category = categotyRepository.findCategoryById(dtoRequest.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("Category khong hop le"));
 
         CustomerRequest request = new CustomerRequest();
-        request.setTitle(dto.getTitle());
-        request.setDescription(dto.getDescription());
-        request.setMinPrice(dto.getMinPrice());
-        request.setMaxPrice(dto.getMaxPrice());
-        request.setCreatedAt(dto.getCreatedAt() != null ? dto.getCreatedAt() : LocalDate.now());
+        request.setTitle(dtoRequest.getTitle());
+        request.setDescription(dtoRequest.getDescription());
+        request.setMinPrice(dtoRequest.getMinPrice());
+        request.setMaxPrice(dtoRequest.getMaxPrice());
+        request.setCreatedAt(dtoRequest.getCreatedAt() != null ? dtoRequest.getCreatedAt() : LocalDate.now());
         request.setIdcategory(category);
-
-        User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new RuntimeException("User ko tồn tại"));
         request.setUser(user);
 
         CustomerRequest saved = customerRequestRepository.save(request);
@@ -64,8 +65,8 @@ public class CustomerRequestService {
     }
 
 
-    private CustomerRequestDTO convertToDTO(CustomerRequest request) {
-        CustomerRequestDTO dto = new CustomerRequestDTO();
+    private CustomerRequestDTOResponse convertToDTO(CustomerRequest request) {
+        CustomerRequestDTOResponse dtoResponse = new CustomerRequestDTOResponse();
         CategoryDTO categoryDTO = null;
         if (request.getIdcategory() != null) {
             categoryDTO = CategoryDTO.builder()
@@ -74,14 +75,28 @@ public class CustomerRequestService {
                     .image(request.getIdcategory().getImage())
                     .build();
         }
-        dto.setId(request.getId());
-        dto.setUserId(request.getUser().getId());
-        dto.setTitle(request.getTitle());
-        dto.setMinPrice(request.getMinPrice());
-        dto.setMaxPrice(request.getMaxPrice());
-        dto.setDescription(request.getDescription());
-        dto.setCreatedAt(request.getCreatedAt());
-        dto.setCategoryId(request.getIdcategory().getId());
-        return dto;
+        UserDTO userDTO = null;
+        if(request.getUser() != null){
+            userDTO = UserDTO.builder()
+                    .id(request.getUser().getId())
+                    .username(request.getUser().getUsername())
+                    .fullname(request.getUser().getFullname())
+                    .address(request.getUser().getAddress())
+                    .phone(request.getUser().getPhone())
+                    .email(request.getUser().getEmail())
+                    .roleId(request.getUser().getRole().getId())
+                    .avatar(request.getUser().getAvatar())
+                    .status(request.getUser().getStatus())
+                    .build();
+        }
+        dtoResponse.setId(request.getId());
+        dtoResponse.setUser(userDTO);
+        dtoResponse.setTitle(request.getTitle());
+        dtoResponse.setMinPrice(request.getMinPrice());
+        dtoResponse.setMaxPrice(request.getMaxPrice());
+        dtoResponse.setDescription(request.getDescription());
+        dtoResponse.setCreatedAt(request.getCreatedAt());
+        dtoResponse.setCategory(categoryDTO);
+        return dtoResponse;
     }
 }

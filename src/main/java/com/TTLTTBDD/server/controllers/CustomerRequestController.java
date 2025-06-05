@@ -1,13 +1,13 @@
 package com.TTLTTBDD.server.controllers;
 
 
-import com.TTLTTBDD.server.models.dto.CustomerRequestDTO;
+import com.TTLTTBDD.server.models.dto.CustomerRequestDTORequest;
+import com.TTLTTBDD.server.models.dto.CustomerRequestDTOResponse;
 import com.TTLTTBDD.server.services.CustomerRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -19,21 +19,21 @@ public class CustomerRequestController {
     private CustomerRequestService customerRequestService;
 
     @GetMapping
-    public ResponseEntity<List<CustomerRequestDTO>> getAllRequests() {
+    public ResponseEntity<List<CustomerRequestDTOResponse>> getAllRequests() {
         return ResponseEntity.ok(customerRequestService.getAllRequests());
     }
     @GetMapping("user")
-    public ResponseEntity<List<CustomerRequestDTO>> getRequestByUserId(@RequestParam int userId){
+    public ResponseEntity<List<CustomerRequestDTOResponse>> getRequestByUserId(@RequestParam int userId){
         return ResponseEntity.ok(customerRequestService.getRequestByUserId(userId));
     }
     @GetMapping("id")
-    public ResponseEntity<List<CustomerRequestDTO>> getRequestById(@RequestParam int id){
+    public ResponseEntity<List<CustomerRequestDTOResponse>> getRequestById(@RequestParam int id){
         return ResponseEntity.ok(customerRequestService.getRequestById(id));
     }
     @PostMapping("/create")
-    public ResponseEntity<?> createRequest(@RequestBody CustomerRequestDTO dto) {
+    public ResponseEntity<?> createRequest(@RequestBody CustomerRequestDTORequest dtoRequest) {
         try {
-            return ResponseEntity.ok(customerRequestService.createRequest(dto));
+            return ResponseEntity.ok(customerRequestService.createRequest(dtoRequest));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
