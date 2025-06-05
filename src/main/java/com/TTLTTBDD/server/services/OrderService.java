@@ -48,8 +48,10 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("Phương thức thanh toán không hợp lệ."));
         DeliveryMethop deliveryMethop = deliveryMethopRepository.findById(idDeliveryMethop)
                 .orElseThrow(() -> new IllegalArgumentException("Phương thức vận chuyển không hợp lệ."));
-        Status status = statusRepository.findById(5)
+        int statusId = (idPaymentMethop == 3) ? 6 : 5;
+        Status status = statusRepository.findById(statusId)
                 .orElseThrow(() -> new IllegalArgumentException("Trạng thái không tồn tại."));
+
 
         BigDecimal totalProductPrice = BigDecimal.ZERO;
         for (CartDetail cartDetail : cartDetails) {
