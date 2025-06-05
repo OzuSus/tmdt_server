@@ -42,10 +42,10 @@ public class CustomerRequestService {
     }
 
     public CustomerRequestDTO createRequest(CustomerRequestDTO dto) {
-        if (dto.getMinPrice() != null && dto.getMaxPrice() != null && dto.getMinPrice() >= dto.getMaxPrice()) {
-            throw new IllegalArgumentException("Giá max phải > giá min");
+        if (dto.getMinPrice() != null && dto.getMaxPrice() != null && dto.getMinPrice() > dto.getMaxPrice()) {
+            throw new IllegalArgumentException("Giá max phải >= giá min");
         }
-        Category category = categotyRepository.findCategoryById(dto.getCategoryId().getId()).orElseThrow(() -> new IllegalArgumentException("Category khong hop le"));
+        Category category = categotyRepository.findCategoryById(dto.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("Category khong hop le"));
 
         CustomerRequest request = new CustomerRequest();
         request.setTitle(dto.getTitle());
@@ -81,7 +81,7 @@ public class CustomerRequestService {
         dto.setMaxPrice(request.getMaxPrice());
         dto.setDescription(request.getDescription());
         dto.setCreatedAt(request.getCreatedAt());
-        dto.setCategoryId(categoryDTO);
+        dto.setCategoryId(request.getIdcategory().getId());
         return dto;
     }
 }
