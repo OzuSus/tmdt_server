@@ -13,13 +13,13 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class JewelerResponseDTO {
     private Integer id;
-    private CustomerRequestDTO customerRequestId;
-    private UserDTO jeweler;
+    private Integer customerRequestId;
+    private Integer jewelerId;
     private String name;
     private Double proposedPrice;
     private String description;
     private String image;
     private LocalDate createdAt;
-    private CategoryDTO categoryId;
+    private Integer categoryId;
 
 }
