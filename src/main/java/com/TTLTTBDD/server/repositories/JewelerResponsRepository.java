@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface JewelerResponsRepository extends JpaRepository<JewelerRespons, Integer> {
     List<JewelerRespons> findAllByRequest_Id(Integer requestId);
+    boolean existsByJeweler_IdAndRequest_Id(Integer jewelerId, Integer requestId);
 }
+

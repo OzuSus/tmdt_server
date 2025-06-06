@@ -1,5 +1,6 @@
 package com.TTLTTBDD.server.controllers;
 
+import com.TTLTTBDD.server.exception.DuplicateJewelerResponseException;
 import com.TTLTTBDD.server.models.dto.JewelerResponseDTORequest;
 import com.TTLTTBDD.server.models.dto.JewelerResponseDTOResponse;
 import com.TTLTTBDD.server.services.JewelerResponseService;
@@ -40,6 +41,8 @@ public class JewelerResponseController {
         try {
             JewelerResponseDTOResponse dto = jewelerResponseService.createResponse(customerRequestId, jewelerId, name, proposedPrice, description, categoryId, image);
             return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+        }catch (DuplicateJewelerResponseException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {

@@ -1,5 +1,6 @@
 package com.TTLTTBDD.server.services;
 
+import com.TTLTTBDD.server.exception.DuplicateJewelerResponseException;
 import com.TTLTTBDD.server.models.dto.*;
 import com.TTLTTBDD.server.models.entity.Category;
 import com.TTLTTBDD.server.models.entity.CustomerRequest;
@@ -42,6 +43,10 @@ public class JewelerResponseService {
     }
 
     public JewelerResponseDTOResponse createResponse(Integer customerRequestId, Integer jewelerId, String name, Double proposedPrice, String description, Integer categoryId, MultipartFile image) throws IOException {
+        boolean alreadyResponded = jewelerResponsRepository.existsByJeweler_IdAndRequest_Id(jewelerId, customerRequestId);
+        if (alreadyResponded) {
+            throw new DuplicateJewelerResponseException("Thợ kim hoàn đã gửi phản hồi cho yêu cầu này.");
+        }
 
         CustomerRequest request = customerRequestRepository.findById(customerRequestId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy yêu cầu khách hàng"));
