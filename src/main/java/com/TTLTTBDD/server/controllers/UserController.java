@@ -202,4 +202,90 @@ public class UserController {
         return userService.getRegularUsersByMonth();
     }
 
+    @GetMapping("/staff")
+    public List<UserDTO> getAllStaffUsers() {
+        return userService.getAllStaffUsers();
+    }
+
+    @PostMapping("/add-jeweler")
+    public ResponseEntity<?> addJeweler(@RequestBody User user) {
+        try {
+            return ResponseEntity.ok(userService.addJeweler(user));
+        } catch (UserAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", "user đã tồn tại"));
+        } catch (PasswordValidationException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "Mật khẩu không hợp lệ",
+                    "details", e.getErrors()
+            ));
+        }
+    }
+
+    @GetMapping("/check-staff")
+    public ResponseEntity<?> checkStaffExists(
+            @RequestParam String username,
+            @RequestParam String email) {
+        return ResponseEntity.ok(userService.checkStaffExists(username, email));
+    }
+
+// như /update chả khác mẹ j.
+    @PutMapping("/update-staff")
+    public ResponseEntity<?> updateStaff(
+            @RequestParam("id") Integer id,
+            @RequestParam("username") String username,
+            @RequestParam("fullname") String fullname,
+            @RequestParam("address") String address,
+            @RequestParam("phone") String phone,
+            @RequestParam("email") String email,
+            @RequestParam("roleId") Integer roleId,
+            @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile) {
+
+        try {
+            UserDTO userDTO = UserDTO.builder()
+                    .id(id)
+                    .username(username)
+                    .fullname(fullname)
+                    .address(address)
+                    .phone(phone)
+                    .email(email)
+                    .roleId(roleId)
+                    .build();
+
+            return ResponseEntity.ok(userService.updateUser(userDTO, avatarFile));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                    "success", false,
+                    "error", e.getMessage()
+            ));
+        }
+    }
+
+    @PostMapping("/delete-staff")
+    public ResponseEntity<?> demoteStaff(@RequestParam("id") Integer id) {
+        try {
+            userService.demoteStaffToUser(id);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Đã chuyển staff về role thường thành công",
+                    "userId", id
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                    "success", false,
+                    "error", e.getMessage(),
+                    "userId", id
+            ));
+        }
+    }
+
+    @PostMapping("/add-employee/{userId}")
+    public ResponseEntity<?> convertToEmployee(@PathVariable Integer userId) {
+        try {
+            return ResponseEntity.ok(userService.convertToEmployee(userId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", e.getMessage()
+            ));
+        }
+    }
 }

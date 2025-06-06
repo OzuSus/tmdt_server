@@ -23,5 +23,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             "GROUP BY YEAR(u.createdAt), MONTH(u.createdAt) " +
             "ORDER BY YEAR(u.createdAt), MONTH(u.createdAt)")
     List<Object[]> countUsersByRoleAndMonthAndStatus(@Param("roleId") Integer roleId, @Param("status") boolean status);
+    List<User> findByRole_IdIn(List<Integer> roleIds);
+    List<User> findByRole_Id(Integer roleId);
+    Optional<User> findByUsernameAndRole_Id(String username, Integer role_id);
 
+    Optional<Object> findByEmailAndRole_Id(String email, Integer roleId);
 }

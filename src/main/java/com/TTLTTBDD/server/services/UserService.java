@@ -241,4 +241,71 @@ public class UserService {
 
         return monthlyStats;
     }
+
+    public List<UserDTO> getAllStaffUsers() {
+        return userRepository.findByRole_IdIn(Arrays.asList(1, 2)).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // Add a jeweler (without verification)
+    public UserDTO addJeweler(User user) {
+        if (userRepository.findByUsername(user.getUsername()).isPresent() ||
+                userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new UserAlreadyExistsException("Username hoặc email đã tồn tại.");
+        }
+        validatePassword(user.getPassword());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setStatus(true); // No verification needed for staff
+
+        Role jewelerRole = roleRepository.findById(1)
+                .orElseThrow(() -> new RuntimeException("Jeweler role không tồn tại"));
+        user.setRole(jewelerRole);
+
+        return convertToDTO(userRepository.save(user));
+    }
+
+    public UserDTO addEmployee(User user) {
+        return addJeweler(user); // Same as addJeweler
+    }
+
+    public Map<String, Boolean> checkStaffExists(String username, String email) {
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("usernameExists", userRepository.findByUsernameAndRole_Id(username,1).isPresent());
+        result.put("emailExists", userRepository.findByEmailAndRole_Id(email,1).isPresent());
+        return result;
+    }
+    @Transactional
+    public void demoteStaffToUser(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
+
+        // Kiểm tra nếu không phải staff (role khác 1 và 2)
+        if(user.getRole().getId() != 1 && user.getRole().getId() != 2) {
+            throw new RuntimeException("User không phải nhân viên hoặc admin");
+        }
+
+        Role userRole = roleRepository.findById(0)
+                .orElseThrow(() -> new RuntimeException("Role user không tồn tại"));
+
+        user.setRole(userRole);
+        userRepository.save(user);
+    }
+    public UserDTO convertToEmployee(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
+
+        // Kiểm tra nếu đã là nhân viên
+        if(user.getRole().getId() == 1 || user.getRole().getId() == 2) {
+            throw new RuntimeException("User đã là nhân viên hoặc admin");
+        }
+
+        Role employeeRole = roleRepository.findById(1)
+                .orElseThrow(() -> new RuntimeException("Role nhân viên không tồn tại"));
+
+        user.setRole(employeeRole);
+        user.setStatus(true); // Kích hoạt tài khoản
+
+        return convertToDTO(userRepository.save(user));
+    }
 }
