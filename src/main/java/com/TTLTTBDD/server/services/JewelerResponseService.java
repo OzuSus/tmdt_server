@@ -50,11 +50,13 @@ public class JewelerResponseService {
 
         CustomerRequest request = customerRequestRepository.findById(customerRequestId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy yêu cầu khách hàng"));
-
         User jeweler = userRepository.findById(jewelerId)
                 .filter(u -> u.getRole().getId() == 1)
                 .orElseThrow(() -> new IllegalArgumentException("Mã thợ kim hoàn ko hợp lệ"));
 
+        if (proposedPrice < request.getMinPrice() || proposedPrice > request.getMaxPrice()) {
+            throw new IllegalArgumentException("Giá đề xuất phải nằm trong khoảng từ " + request.getMinPrice() + " đến " + request.getMaxPrice());
+        }
 
         Category category = categotyRepository.findById(categoryId)
                 .orElseThrow(() -> new IllegalArgumentException("Danh mục ko hợp lệ"));
