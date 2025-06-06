@@ -410,11 +410,16 @@ public class OrderService {
         return orders.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
-    public void cancelOrder(Integer orderId) {
+    public void cancelOrder(Integer orderId, Integer userId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
 
-        // Chỉ cho hủy nếu status là chưa xác nhận (id là 5)
+        // Check quyền sở hữu
+        if (order.getIdUser().getId() != userId) {
+            throw new RuntimeException("Bạn không có quyền hủy đơn hàng này");
+        }
+
+        // Chỉ cho hủy nếu status là "Chưa xác nhận" (ID = 5)
         if (order.getIdStatus().getId() != 5) {
             throw new IllegalStateException("Chỉ có thể hủy đơn hàng chưa xác nhận");
         }
@@ -423,8 +428,12 @@ public class OrderService {
         List<OrderDetail> details = orderDetailRepository.findByIdOder_Id(orderId);
         orderDetailRepository.deleteAll(details);
 
-        // Sau đó xóa đơn
-        orderRepository.delete(order);
+        // Set trạng thái mới là "Đã hủy" (ID = 9)
+        Status cancelledStatus = statusRepository.findById(9)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy trạng thái 'Đã hủy'"));
+
+        order.setIdStatus(cancelledStatus);
+        orderRepository.save(order);
     }
 
 }

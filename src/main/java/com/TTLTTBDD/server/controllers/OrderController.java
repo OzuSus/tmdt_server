@@ -186,6 +186,7 @@ public class OrderController {
         boolean hasPurchased = orderService.hasUserPurchasedProduct(userId, productId);
         return ResponseEntity.ok(hasPurchased);
     }
+
     @GetMapping("/monthly-revenue")
     public ResponseEntity<?> getMonthlyRevenue(@RequestParam int year) {
         List<Object[]> data = orderService.getRevenuePerMonth(year);
@@ -220,19 +221,22 @@ public class OrderController {
         }).collect(Collectors.toList());
         return ResponseEntity.ok(response);
     }
+
     @GetMapping("/total-price/status/{statusId}")
     public ResponseEntity<Double> getTotalPriceByStatus(@PathVariable int statusId) {
         Double totalPrice = orderService.getTotalPriceByStatus(statusId);
         return ResponseEntity.ok(totalPrice != null ? totalPrice : 0.0);
     }
+
     @GetMapping("/completed")
     public ResponseEntity<List<OrderDTO>> getCompletedOrders() {
 
         List<OrderDTO> completedOrders = orderService.getOrdersByStatus();
         return ResponseEntity.ok(completedOrders);
     }
+
     @GetMapping("/all")
-    public ResponseEntity<List<OrderDTO>>getAllOrders() {
+    public ResponseEntity<List<OrderDTO>> getAllOrders() {
         List<OrderDTO> orders = orderService.getAllOrders();
         return ResponseEntity.ok(orders);
     }
@@ -251,10 +255,12 @@ public class OrderController {
         }
     }
 
-    @DeleteMapping("/cancel/{id}")
-    public ResponseEntity<String> cancelOrder(@PathVariable Integer id) {
+    @PutMapping("/cancel")
+    public ResponseEntity<String> cancelOrder(
+            @RequestParam("orderId") Integer orderId,
+            @RequestParam("userId") Integer userId) {
         try {
-            orderService.cancelOrder(id);
+            orderService.cancelOrder(orderId, userId);
             return ResponseEntity.ok("Đã hủy đơn hàng thành công");
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
