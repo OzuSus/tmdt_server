@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface CustomerRequestRepository extends JpaRepository<CustomerRequest, Integer> {
     List<CustomerRequest> findByUser_Id(int userId);
-    List<CustomerRequest> findById(int Id);
+
 
 }

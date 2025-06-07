@@ -4,6 +4,7 @@ package com.TTLTTBDD.server.controllers;
 import com.TTLTTBDD.server.models.dto.CustomerRequestDTORequest;
 import com.TTLTTBDD.server.models.dto.CustomerRequestDTOResponse;
 import com.TTLTTBDD.server.services.CustomerRequestService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,19 @@ public class CustomerRequestController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
+    @Transactional
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteRequest(@RequestParam int id, @RequestParam int userId) {
+        try {
+            customerRequestService.deleteRequestById(id, userId);
+            return ResponseEntity.ok("Xóa yêu cầu và phản hồi thành công.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        }
+    }
+
+
 
 }
 

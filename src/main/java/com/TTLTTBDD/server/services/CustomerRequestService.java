@@ -7,14 +7,14 @@ import com.TTLTTBDD.server.models.dto.UserDTO;
 import com.TTLTTBDD.server.models.entity.Category;
 import com.TTLTTBDD.server.models.entity.CustomerRequest;
 import com.TTLTTBDD.server.models.entity.User;
-import com.TTLTTBDD.server.repositories.CategotyRepository;
-import com.TTLTTBDD.server.repositories.CustomerRequestRepository;
-import com.TTLTTBDD.server.repositories.UserRepository;
+import com.TTLTTBDD.server.models.entity.UserAccept;
+import com.TTLTTBDD.server.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,7 +25,10 @@ public class CustomerRequestService {
     UserRepository userRepository;
     @Autowired
     CategotyRepository categotyRepository;
-
+    @Autowired
+    private JewelerResponsRepository jewelerResponsRepository;
+    @Autowired
+    private UserAcceptRepository userAcceptRepository;
     public List<CustomerRequestDTOResponse> getAllRequests() {
         return customerRequestRepository.findAll().stream()
                 .map(this::convertToDTO)
@@ -67,6 +70,24 @@ public class CustomerRequestService {
         CustomerRequest saved = customerRequestRepository.save(request);
         return convertToDTO(saved);
     }
+
+
+    public void deleteRequestById(int id, int userId) throws Exception {
+        Optional<CustomerRequest> optionalRequest = customerRequestRepository.findById(id);
+
+        if (optionalRequest.isEmpty()) {
+            throw new Exception("Request không tồn tại");
+        }
+        CustomerRequest request = optionalRequest.get();
+        if (request.getUser() == null || !request.getUser().getId().equals(userId)) {
+            throw new Exception("Bạn không có quyền xóa request này");
+        }
+//        Optional<UserAccept> optionalUserAcept = userAcceptRepository.findById(id);
+        userAcceptRepository.deleteByRequest_Id(id);
+        jewelerResponsRepository.deleteByRequest_Id(id);
+        customerRequestRepository.deleteById(id);
+    }
+
 
 
     private CustomerRequestDTOResponse convertToDTO(CustomerRequest request) {
