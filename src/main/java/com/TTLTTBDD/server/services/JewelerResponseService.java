@@ -35,11 +35,11 @@ public class JewelerResponseService {
 
 
     public List<JewelerResponseDTOResponse> getAllResponses() {
-        return jewelerResponsRepository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
+        return jewelerResponsRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
     public List<JewelerResponseDTOResponse> getResponsesByRequestId(Integer requestId) {
-        return jewelerResponsRepository.findAllByRequest_Id(requestId).stream().map(this::toDTO).collect(Collectors.toList());
+        return jewelerResponsRepository.findAllByRequest_Id(requestId).stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
     public JewelerResponseDTOResponse createResponse(Integer customerRequestId, Integer jewelerId, String name, Double proposedPrice, String description, Integer categoryId, MultipartFile image) throws IOException {
@@ -73,10 +73,10 @@ public class JewelerResponseService {
         entity.setCreatedAt(LocalDate.now());
         entity.setCategory(category);
 
-        return toDTO(jewelerResponsRepository.save(entity));
+        return convertToDTO(jewelerResponsRepository.save(entity));
     }
 
-    private JewelerResponseDTOResponse toDTO(JewelerRespons jewelerRespons) {
+    private JewelerResponseDTOResponse convertToDTO(JewelerRespons jewelerRespons) {
         JewelerResponseDTOResponse dtoResponse = new JewelerResponseDTOResponse();
 
         UserDTO userDTO = null;
@@ -109,7 +109,7 @@ public class JewelerResponseService {
                     .title(jewelerRespons.getRequest().getTitle())
                     .minPrice(jewelerRespons.getRequest().getMinPrice())
                     .maxPrice(jewelerRespons.getRequest().getMaxPrice())
-                    .description(jewelerRespons.getDescription())
+                    .description(jewelerRespons.getRequest().getDescription())
                     .createdAt(jewelerRespons.getRequest().getCreatedAt())
                     .category(categoryDTO)
                     .build();

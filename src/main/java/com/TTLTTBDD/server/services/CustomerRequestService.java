@@ -46,9 +46,13 @@ public class CustomerRequestService {
         User user = userRepository.findById(dtoRequest.getUserId())
                 .filter(u -> u.getRole().getId() == 0)
                 .orElseThrow(() -> new RuntimeException("Lỗi: User ko tồn tại or user là jeweler/admin"));
-        if (dtoRequest.getMinPrice() != null && dtoRequest.getMaxPrice() != null && dtoRequest.getMinPrice() > dtoRequest.getMaxPrice()) {
-            throw new IllegalArgumentException("Giá max phải >= giá min");
+        if (dtoRequest.getMinPrice() == null || dtoRequest.getMaxPrice() == null) {
+            throw new IllegalArgumentException("Giá min/max không được để trống");
         }
+        if (dtoRequest.getMinPrice() > dtoRequest.getMaxPrice()) {
+            throw new IllegalArgumentException("Giá min phải <= giá max");
+        }
+
         Category category = categotyRepository.findCategoryById(dtoRequest.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("Category khong hop le"));
 
         CustomerRequest request = new CustomerRequest();
