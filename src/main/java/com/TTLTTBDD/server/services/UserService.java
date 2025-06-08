@@ -3,6 +3,7 @@ package com.TTLTTBDD.server.services;
 import com.TTLTTBDD.server.exception.PasswordValidationException;
 import com.TTLTTBDD.server.exception.UserAlreadyExistsException;
 import com.TTLTTBDD.server.exception.UserNotVerifiedException;
+import com.TTLTTBDD.server.models.dto.StaffDTO;
 import com.TTLTTBDD.server.models.dto.UserDTO;
 import com.TTLTTBDD.server.models.entity.Cart;
 import com.TTLTTBDD.server.models.entity.Role;
@@ -307,5 +308,17 @@ public class UserService {
         user.setStatus(true); // Kích hoạt tài khoản
 
         return convertToDTO(userRepository.save(user));
+    }
+    public UserDTO updateStaffInfoAccount(StaffDTO StaffDTO) {
+        User user = userRepository.findById(StaffDTO.getId()).orElseThrow(() -> new RuntimeException("Ko tìm thấy user"));
+        user.setUsername(StaffDTO.getUsername());
+        user.setFullname(StaffDTO.getFullname());
+        user.setAddress(StaffDTO.getAddress());
+        user.setPhone(StaffDTO.getPhone());
+        user.setEmail(StaffDTO.getEmail());
+
+        userRepository.save(user);
+        return convertToDTO(user);
+
     }
 }

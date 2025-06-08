@@ -3,6 +3,7 @@ package com.TTLTTBDD.server.controllers;
 import com.TTLTTBDD.server.exception.PasswordValidationException;
 import com.TTLTTBDD.server.exception.UserAlreadyExistsException;
 import com.TTLTTBDD.server.exception.UserNotVerifiedException;
+import com.TTLTTBDD.server.models.dto.StaffDTO;
 import com.TTLTTBDD.server.models.dto.UserDTO;
 import com.TTLTTBDD.server.models.entity.User;
 import com.TTLTTBDD.server.models.entity.Verifytoken;
@@ -231,27 +232,11 @@ public class UserController {
 // như /update chả khác mẹ j.
     @PutMapping("/update-staff")
     public ResponseEntity<?> updateStaff(
-            @RequestParam("id") Integer id,
-            @RequestParam("username") String username,
-            @RequestParam("fullname") String fullname,
-            @RequestParam("address") String address,
-            @RequestParam("phone") String phone,
-            @RequestParam("email") String email,
-            @RequestParam("roleId") Integer roleId,
-            @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile) {
+            @RequestBody StaffDTO staffDTO
+            ) {
 
         try {
-            UserDTO userDTO = UserDTO.builder()
-                    .id(id)
-                    .username(username)
-                    .fullname(fullname)
-                    .address(address)
-                    .phone(phone)
-                    .email(email)
-                    .roleId(roleId)
-                    .build();
-
-            return ResponseEntity.ok(userService.updateUser(userDTO, avatarFile));
+            return ResponseEntity.ok(userService.updateStaffInfoAccount(staffDTO));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
                     "success", false,
