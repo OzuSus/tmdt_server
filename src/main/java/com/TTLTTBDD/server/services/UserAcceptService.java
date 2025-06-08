@@ -43,12 +43,13 @@ public class UserAcceptService {
         String description = response.getDescription();
         Category category = response.getCategory();
         String image = response.getImage();
+        User user = response.getJeweler();
         Optional<Product> existingProductOpt = productRepository.findByNameAndDescriptionAndImageAndIdCategory(name, description, image, category);
         ProductDTO newProduct = null;
         if (existingProductOpt.isPresent()) {
             newProduct = productService.convertToDTO(existingProductOpt.get());
         } else {
-            newProduct = productService.addProduct(name, quantity, prize, description, category, image);
+            newProduct = productService.addProductWithIdJeweler(name, quantity, prize, description, category, image, user);
         }
 
         Integer idUser = request.getUser().getId();
