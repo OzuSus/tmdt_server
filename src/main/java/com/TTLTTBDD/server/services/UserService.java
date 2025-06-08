@@ -276,14 +276,16 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setStatus(true); // Không cần xác minh qua email
 
-        Cart newCart = new Cart();
-        newCart.setIdUser(user);
-        cartRepository.save(newCart);
+
+
         Role jewelerRole = roleRepository.findById(1)
                 .orElseThrow(() -> new RuntimeException("Jeweler role không tồn tại"));
         user.setRole(jewelerRole);
-
-        return convertToDTO(userRepository.save(user));
+        userRepository.save(user);
+        Cart newCart = new Cart();
+        newCart.setIdUser(user);
+        cartRepository.save(newCart);
+        return convertToDTO(user);
     }
 
 
