@@ -424,9 +424,9 @@ public class OrderService {
             throw new IllegalStateException("Chỉ có thể hủy đơn hàng chưa xác nhận");
         }
 
-        // Tìm và xóa các chi tiết đơn
-        List<OrderDetail> details = orderDetailRepository.findByIdOder_Id(orderId);
-        orderDetailRepository.deleteAll(details);
+//        // Tìm và xóa các chi tiết đơn
+//        List<OrderDetail> details = orderDetailRepository.findByIdOder_Id(orderId);
+//        orderDetailRepository.deleteAll(details);
 
         // Set trạng thái mới là "Đã hủy" (ID = 9)
         Status cancelledStatus = statusRepository.findById(9)
