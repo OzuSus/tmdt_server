@@ -309,14 +309,16 @@ public class UserService {
 
         return convertToDTO(userRepository.save(user));
     }
-    public UserDTO updateStaffInfoAccount(StaffDTO StaffDTO) {
-        User user = userRepository.findById(StaffDTO.getId()).orElseThrow(() -> new RuntimeException("Ko tìm thấy user"));
-        user.setUsername(StaffDTO.getUsername());
-        user.setFullname(StaffDTO.getFullname());
-        user.setAddress(StaffDTO.getAddress());
-        user.setPhone(StaffDTO.getPhone());
-        user.setEmail(StaffDTO.getEmail());
-
+    public UserDTO updateStaffInfoAccount(StaffDTO staffDTO) {
+        User user = userRepository.findById(staffDTO.getId()).orElseThrow(() -> new RuntimeException("Ko tìm thấy user"));
+        user.setUsername(staffDTO.getUsername());
+        user.setFullname(staffDTO.getFullname());
+        user.setAddress(staffDTO.getAddress());
+        user.setPhone(staffDTO.getPhone());
+        user.setEmail(staffDTO.getEmail());
+        Role role = roleRepository.findById(staffDTO.getRoleId())
+                .orElseThrow(() -> new RuntimeException("Role không tồn tại"));
+        user.setRole(role);
         userRepository.save(user);
         return convertToDTO(user);
 
