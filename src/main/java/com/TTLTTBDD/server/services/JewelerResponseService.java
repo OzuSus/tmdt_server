@@ -57,6 +57,9 @@ public class JewelerResponseService {
         if (proposedPrice < request.getMinPrice() || proposedPrice > request.getMaxPrice()) {
             throw new IllegalArgumentException("Giá phải nằm trong khoảng từ " + request.getMinPrice() + " đến " + request.getMaxPrice());
         }
+        if (categoryId != request.getIdcategory().getId()) {
+            throw new IllegalArgumentException("Danh mục lựa chọn khác với yêu cầu!");
+        }
 
         Category category = categotyRepository.findById(categoryId)
                 .orElseThrow(() -> new IllegalArgumentException("Danh mục ko hợp lệ"));
