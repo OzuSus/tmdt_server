@@ -162,7 +162,7 @@ public class OrderService {
                 .rating(oder.getIdProduct().getRating())
                 .categoryID(oder.getIdProduct().getIdCategory().getId())
                 .tag(oder.getIdProduct().getTag())
-                .jewelerID(oder.getIdProduct().getIdJeweler().getId())
+//                .jewelerID(oder.getIdProduct().getIdJeweler().getId())
                 .build();
         return OrderDetailDTO.builder()
                 .id(oder.getId())
