@@ -208,10 +208,12 @@ public class UserController {
         return userService.getAllStaffUsers();
     }
 
-    @PostMapping("/add-jeweler")
-    public ResponseEntity<?> addJeweler(@RequestBody User user) {
+    @PostMapping("{adminId}/add-jeweler")
+    public ResponseEntity<?> addJeweler(
+            @PathVariable Integer adminId,
+            @RequestBody StaffDTO userDTO) {
         try {
-            return ResponseEntity.ok(userService.addJeweler(user));
+            return ResponseEntity.ok(userService.addJeweler(adminId,userDTO));
         } catch (UserAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", "user đã tồn tại"));
         } catch (PasswordValidationException e) {
@@ -229,14 +231,15 @@ public class UserController {
         return ResponseEntity.ok(userService.checkStaffExists(username, email));
     }
 
-// như /update chả khác mẹ j.
-    @PutMapping("/update-staff")
+    @PutMapping("{adminId}/update-staff")
     public ResponseEntity<?> updateStaff(
-            @RequestBody StaffDTO staffDTO
+            @PathVariable Integer adminId,
+            @RequestBody StaffDTO staffDTO,
+            @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile
             ) {
 
         try {
-            return ResponseEntity.ok(userService.updateStaffInfoAccount(staffDTO));
+            return ResponseEntity.ok(userService.updateStaffInfoAccount(adminId,staffDTO,avatarFile));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
                     "success", false,
@@ -245,10 +248,12 @@ public class UserController {
         }
     }
 
-    @PostMapping("/delete-staff")
-    public ResponseEntity<?> demoteStaff(@RequestParam("id") Integer id) {
+    @PostMapping("{adminId}/delete-staff")
+    public ResponseEntity<?> demoteStaff(
+            @PathVariable Integer adminId,
+            @RequestParam("id") Integer id) {
         try {
-            userService.demoteStaffToUser(id);
+            userService.demoteStaffToUser(adminId,id);
             return ResponseEntity.ok(Map.of(
                     "success", true,
                     "message", "Đã chuyển staff về role thường thành công",
@@ -263,10 +268,12 @@ public class UserController {
         }
     }
 
-    @PostMapping("/add-employee/{userId}")
-    public ResponseEntity<?> convertToEmployee(@PathVariable Integer userId) {
+    @PostMapping("/{adminId}/add-employee/{userId}")
+    public ResponseEntity<?> convertToEmployee(
+            @PathVariable Integer adminId,
+            @PathVariable Integer userId) {
         try {
-            return ResponseEntity.ok(userService.convertToEmployee(userId));
+            return ResponseEntity.ok(userService.convertToEmployee(adminId,userId));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of(
                     "error", e.getMessage()

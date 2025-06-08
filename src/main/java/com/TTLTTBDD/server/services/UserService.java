@@ -12,6 +12,8 @@ import com.TTLTTBDD.server.models.entity.Verifytoken;
 import com.TTLTTBDD.server.repositories.*;
 import com.TTLTTBDD.server.utils.loadFile;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +43,8 @@ public class UserService {
     private FavoriteRepository favoriteRepository;
     @Autowired
     private RoleRepository roleRepository;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
@@ -250,15 +254,31 @@ public class UserService {
     }
 
     // Add a jeweler (without verification)
-    public UserDTO addJeweler(User user) {
-        if (userRepository.findByUsername(user.getUsername()).isPresent() ||
-                userRepository.findByEmail(user.getEmail()).isPresent()) {
+    public UserDTO addJeweler(Integer adminId, StaffDTO userDTO) {
+        User currentUser = userRepository.findById(adminId).
+                orElseThrow(() -> new RuntimeException("User không tồn tại"));
+        if(currentUser.getRole().getId()!= 2){
+            throw new AccessDeniedException("Bạn không có quyền thêm nhân viên");
+        }
+        if (userRepository.findByUsername(userDTO.getUsername()).isPresent() ||
+                userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
             throw new UserAlreadyExistsException("Username hoặc email đã tồn tại.");
         }
-        validatePassword(user.getPassword());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setStatus(true); // No verification needed for staff
 
+        validatePassword(userDTO.getPassword());
+
+        User user = new User();
+        user.setUsername(userDTO.getUsername());
+        user.setFullname(userDTO.getFullname());
+        user.setAddress(userDTO.getAddress());
+        user.setPhone(userDTO.getPhone());
+        user.setEmail(userDTO.getEmail());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setStatus(true); // Không cần xác minh qua email
+
+        Cart newCart = new Cart();
+        newCart.setIdUser(user);
+        cartRepository.save(newCart);
         Role jewelerRole = roleRepository.findById(1)
                 .orElseThrow(() -> new RuntimeException("Jeweler role không tồn tại"));
         user.setRole(jewelerRole);
@@ -266,9 +286,10 @@ public class UserService {
         return convertToDTO(userRepository.save(user));
     }
 
-    public UserDTO addEmployee(User user) {
-        return addJeweler(user); // Same as addJeweler
-    }
+
+//    public UserDTO addEmployee(User user) {
+//        return addJeweler(user); // Same as addJeweler
+//    }
 
     public Map<String, Boolean> checkStaffExists(String username, String email) {
         Map<String, Boolean> result = new HashMap<>();
@@ -277,13 +298,22 @@ public class UserService {
         return result;
     }
     @Transactional
-    public void demoteStaffToUser(Integer userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
+    public void demoteStaffToUser(Integer adminId, Integer staffId) {
+        User currentUser = userRepository.findById(adminId).
+                orElseThrow(() -> new RuntimeException("User không tồn tại"));
+
+        if(currentUser.getRole().getId()!= 2){
+            throw new AccessDeniedException("Bạn không có quyền hạ cấp nhân viên");
+        }
+        User user = userRepository.findById(staffId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên"));
 
         // Kiểm tra nếu không phải staff (role khác 1 và 2)
-        if(user.getRole().getId() != 1 && user.getRole().getId() != 2) {
-            throw new RuntimeException("User không phải nhân viên hoặc admin");
+//        if(user.getRole().getId() != 1 && user.getRole().getId() != 2) {
+//            throw new RuntimeException("User không phải nhân viên hoặc admin");
+//        }
+        if(user.getRole().getId() != 1) {
+            throw new RuntimeException("User không phải nhân viên");
         }
 
         Role userRole = roleRepository.findById(0)
@@ -292,7 +322,14 @@ public class UserService {
         user.setRole(userRole);
         userRepository.save(user);
     }
-    public UserDTO convertToEmployee(Integer userId) {
+    public UserDTO convertToEmployee(Integer adminId,Integer userId) {
+
+        User currentUser = userRepository.findById(adminId).
+                orElseThrow(() -> new RuntimeException("User không tồn tại"));
+
+        if(currentUser.getRole().getId()!= 2){
+            throw new AccessDeniedException("Bạn không có quyền này");
+        }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
 
@@ -309,8 +346,23 @@ public class UserService {
 
         return convertToDTO(userRepository.save(user));
     }
-    public UserDTO updateStaffInfoAccount(StaffDTO staffDTO) {
+    public UserDTO updateStaffInfoAccount(Integer adminId, StaffDTO staffDTO,MultipartFile avatarFile) {
+        try{
+        User currentUser = userRepository.findById(adminId).
+                orElseThrow(() -> new RuntimeException("User không tồn tại"));
+
+        if(currentUser.getRole().getId()!= 2){
+            throw new AccessDeniedException("Bạn không có quyền chỉnh thông tin nhân viên");
+        }
         User user = userRepository.findById(staffDTO.getId()).orElseThrow(() -> new RuntimeException("Ko tìm thấy user"));
+        if (avatarFile != null && !avatarFile.isEmpty()) {
+            String avatarPath = loadFile.saveFile(avatarFile);  // Lưu avatar mới
+            staffDTO.setAvatar(avatarPath);
+        }
+        if (staffDTO.getAvatar() != null) {
+            user.setAvatar(staffDTO.getAvatar());
+        }
+
         user.setUsername(staffDTO.getUsername());
         user.setFullname(staffDTO.getFullname());
         user.setAddress(staffDTO.getAddress());
@@ -321,6 +373,8 @@ public class UserService {
         user.setRole(role);
         userRepository.save(user);
         return convertToDTO(user);
-
+        } catch (IOException e) {
+        throw new RuntimeException("Lỗi khi tải lên avatar", e);
+    }
     }
 }
