@@ -25,5 +25,10 @@ public class UserAcceptController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+    @GetMapping("/isAccept")
+    public ResponseEntity<Boolean> isUserAcceptResponse(@RequestParam Integer requestId, @RequestParam Integer responseId) {
+        boolean exists = userAcceptService.isUserAcceptResponse(requestId, responseId);
+        return ResponseEntity.ok(exists);
+    }
 
 }

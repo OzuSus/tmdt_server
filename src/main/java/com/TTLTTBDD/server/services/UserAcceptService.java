@@ -67,4 +67,12 @@ public class UserAcceptService {
         dto.setResponseId(saved.getResponse().getId());
         return dto;
     }
+    public boolean isUserAcceptResponse(Integer requestId, Integer responseId) {
+        CustomerRequest request = customerRequestRepository.findById(requestId).orElse(null);
+        JewelerRespons response = jewelerResponsRepository.findById(responseId).orElse(null);
+        if (request == null || response == null) {
+            return false;
+        }
+        return userAcceptRepository.existsByRequest_IdAndResponse_Id(requestId, responseId);
+    }
 }

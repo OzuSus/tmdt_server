@@ -58,7 +58,7 @@ public class JewelerResponseService {
             throw new IllegalArgumentException("Giá phải nằm trong khoảng từ " + request.getMinPrice() + " đến " + request.getMaxPrice());
         }
         if (categoryId != request.getIdcategory().getId()) {
-            throw new IllegalArgumentException("Danh mục lựa chọn khác với yêu cầu!");
+            throw new IllegalArgumentException("Danh mục yêu cầu là: " +request.getIdcategory().getName());
         }
 
         Category category = categotyRepository.findById(categoryId)
