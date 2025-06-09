@@ -348,8 +348,8 @@ public class UserService {
 
         return convertToDTO(userRepository.save(user));
     }
-    public UserDTO updateStaffInfoAccount(Integer adminId, StaffDTO staffDTO,MultipartFile avatarFile) {
-        try{
+    public UserDTO updateStaffInfoAccount(Integer adminId, StaffDTO staffDTO) {
+
         User currentUser = userRepository.findById(adminId).
                 orElseThrow(() -> new RuntimeException("User không tồn tại"));
 
@@ -357,13 +357,13 @@ public class UserService {
             throw new AccessDeniedException("Bạn không có quyền chỉnh thông tin nhân viên");
         }
         User user = userRepository.findById(staffDTO.getId()).orElseThrow(() -> new RuntimeException("Ko tìm thấy user"));
-        if (avatarFile != null && !avatarFile.isEmpty()) {
-            String avatarPath = loadFile.saveFile(avatarFile);  // Lưu avatar mới
-            staffDTO.setAvatar(avatarPath);
-        }
-        if (staffDTO.getAvatar() != null) {
-            user.setAvatar(staffDTO.getAvatar());
-        }
+//        if (avatarFile != null && !avatarFile.isEmpty()) {
+//            String avatarPath = loadFile.saveFile(avatarFile);  // Lưu avatar mới
+//            staffDTO.setAvatar(avatarPath);
+//        }
+//        if (staffDTO.getAvatar() != null) {
+//            user.setAvatar(staffDTO.getAvatar());
+//        }
 
         user.setUsername(staffDTO.getUsername());
         user.setFullname(staffDTO.getFullname());
@@ -375,8 +375,6 @@ public class UserService {
         user.setRole(role);
         userRepository.save(user);
         return convertToDTO(user);
-        } catch (IOException e) {
-        throw new RuntimeException("Lỗi khi tải lên avatar", e);
-    }
+
     }
 }

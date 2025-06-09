@@ -234,12 +234,12 @@ public class UserController {
     @PutMapping("{adminId}/update-staff")
     public ResponseEntity<?> updateStaff(
             @PathVariable Integer adminId,
-            @RequestBody StaffDTO staffDTO,
-            @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile
+            @RequestBody StaffDTO staffDTO
+//            @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile
             ) {
 
         try {
-            return ResponseEntity.ok(userService.updateStaffInfoAccount(adminId,staffDTO,avatarFile));
+            return ResponseEntity.ok(userService.updateStaffInfoAccount(adminId,staffDTO));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
                     "success", false,
