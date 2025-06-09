@@ -17,7 +17,7 @@ public class CustomerRequest {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "userId", referencedColumnName = "id_user")
     private User user;
 
     @Column(name = "title")
@@ -35,5 +35,9 @@ public class CustomerRequest {
 
     @Column(name = "created_at")
     private LocalDate createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idcategory")
+    private Category idcategory;
 
 }

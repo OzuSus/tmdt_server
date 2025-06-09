@@ -4,8 +4,10 @@ import com.TTLTTBDD.server.models.dto.ProductDTO;
 import com.TTLTTBDD.server.models.entity.Category;
 import com.TTLTTBDD.server.models.entity.Product;
 import com.TTLTTBDD.server.models.entity.Review;
+import com.TTLTTBDD.server.models.entity.User;
 import com.TTLTTBDD.server.repositories.ProductRepository;
 import com.TTLTTBDD.server.repositories.ReviewRepository;
+import com.TTLTTBDD.server.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +20,14 @@ import java.util.stream.Collectors;
 public class ProductService {
     private final ProductRepository productRepository;
     private final ReviewRepository reviewRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public ProductService(ProductRepository productRepository, ReviewRepository reviewRepository) {
+    public ProductService(ProductRepository productRepository, ReviewRepository reviewRepository,
+                          UserRepository userRepository) {
         this.productRepository = productRepository;
         this.reviewRepository = reviewRepository;
+        this.userRepository = userRepository;
     }
 
     public List<ProductDTO> getAllProducts() {
@@ -62,7 +67,7 @@ public class ProductService {
         return convertToDTO(product1);
     }
 
-    private ProductDTO convertToDTO(Product product) {
+    public ProductDTO convertToDTO(Product product) {
         return ProductDTO.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -88,6 +93,20 @@ public class ProductService {
         product.setIdCategory(idCategory);
         product.setRating(0.0);
         product.setReview(0);
+        productRepository.save(product);
+        return convertToDTO(product);
+    }
+    public ProductDTO addProductWithIdJeweler(String name, BigDecimal quantity, Double prize, String description, Category idCategory, String fileName,User idJeweler) {
+        Product product = new Product();
+        product.setName(name);
+        product.setImage(fileName);
+        product.setQuantity(quantity);
+        product.setPrize(prize);
+        product.setDescription(description);
+        product.setIdCategory(idCategory);
+        product.setRating(0.0);
+        product.setReview(0);
+        product.setIdJeweler(idJeweler);
         productRepository.save(product);
         return convertToDTO(product);
     }
